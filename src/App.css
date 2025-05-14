@@ -40,3 +40,14 @@
 .read-the-docs {
   color: #888;
 }
+
+.my-background {
+  background-color: #f0f0f0;
+}
+
+body, html {
+  background-color: #f0f0f0; /* Or #fff for pure white */
+  min-height: 100vh;
+  margin: 0;
+  padding: 0;
+}
