@@ -51,3 +51,27 @@ body, html {
   margin: 0;
   padding: 0;
 }
+
+.horizontal-scroll-container {
+  display: flex;
+  overflow-x: auto; /* this will allow horizontal scrolling */
+  scroll-snap-type: x mandatory; /* this will make the scroll snap to each child */
+  height: 100vh;
+  width: 100vw;
+  scroll-behavior: smooth; /* this will make the scroll smooth */
+}
+
+.page-section {
+  flex: none; /* prevents shrinking */
+  width: 100vw;
+  height : 100vh;
+  scroll-snap-align: start; /* this will make the scroll snap to the start of each child */
+  display: flex; 
+  justify-content: center;
+  align-items: center;
+  background-color: #f0f0f0
+}
+
+.horizontal-scroll-container::-webkit-scrollbar {
+  display: none; /* this will hide the scrollbar */
+}
