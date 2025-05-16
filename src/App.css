@@ -67,6 +67,7 @@ body, html {
   height : 100vh;
   scroll-snap-align: start; /* this will make the scroll snap to the start of each child */
   display: flex; 
+  flex-direction: column;
   justify-content: center;
   align-items: center;
   background-color: #f0f0f0

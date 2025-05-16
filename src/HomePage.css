@@ -1,0 +1,13 @@
+/* This fil styles components of the HomePage */
+
+.page-section {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    width: 100vw;
+    height: 100vh;
+    scroll-snap-align: start;
+    /* background-color: #f0f0f0; /* Light gray background */ 
+    color: #333;
+}
