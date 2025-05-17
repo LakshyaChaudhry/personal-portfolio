@@ -6,6 +6,7 @@ import React from "react";
 import HomePage from "./components/HomePage";
 import CodingProjects from "./components/CodingProjects";
 import Blog from "./components/Blog";
+import Navigation from "./components/Navigation";
 import "./App.css";
 
 
@@ -14,12 +15,21 @@ import "./App.css";
 export default function App() {
   return (
     <>
+    <Navigation />
+    
     <div className="horizontal-scroll-container">
-      <HomePage />
+      <div id="homepage">
+        <HomePage />
+      </div>
+      <div id="codingProjects">
+        <CodingProjects />
+      </div>
+      <div id="blog">
+        <Blog />
+      </div>
+      
 
-      <CodingProjects />
 
-      <Blog />
     </div>
     
     </>

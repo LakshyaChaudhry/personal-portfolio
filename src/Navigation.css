@@ -1,0 +1,29 @@
+
+.site-navigation {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    background-color: rgba(255, 255, 255, 0.8);
+    padding: 10px 0;
+    z-index: 1000;
+    text-align: center;
+}
+
+.site-navigation ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    justify-content: center;
+  }
+  
+  .site-navigation li {
+    margin: 0 15px;
+  }
+  
+  .site-navigation a {
+    text-decoration: none;
+    color: #333;
+    font-weight: bold;
+  }
