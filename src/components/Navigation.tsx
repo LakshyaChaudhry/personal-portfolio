@@ -3,8 +3,8 @@ import '../Navigation.css';
 
 function Navigation() {
     return ( 
-        <nav className="navbar">
-            <ul>
+        <nav className="site-navigation">
+            <ul className="nav-list">
                 <li>
                     <a href="#homepage">Home</a>
                 </li>
