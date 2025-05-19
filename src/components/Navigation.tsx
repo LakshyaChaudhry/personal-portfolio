@@ -14,6 +14,9 @@ function Navigation() {
                 <li>
                     <a href="#blog">Blog</a>
                 </li>
+                <li>
+                    <a href="#experience">Experience</a>
+                </li>
             </ul>
         </nav>
     );
