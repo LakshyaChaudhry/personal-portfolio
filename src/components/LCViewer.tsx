@@ -7,7 +7,7 @@ import * as THREE from "three"
 
 const LCModel: FC = () => {
   const ref = useRef<THREE.Group>(null!)
-  const gltf = useLoader(GLTFLoader, "/LCLogoV1.glb")
+  const gltf = useLoader(GLTFLoader, "LCLogoV1.glb")
 
   useFrame((_state, delta) => {
     if (ref.current) {

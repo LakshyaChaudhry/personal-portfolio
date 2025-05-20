@@ -9,7 +9,7 @@ function HomePage() {
             {/* <h1> Welcome Page </h1>
             <p> Learn about my work, projects, and hobbies</p> */}
             
-            <div style={{ width: '100vw', height: '100vh'}}>
+            <div style={{ width: '100vw', height: '80vh'}}>
                 <LCViewer />
             </div>
 

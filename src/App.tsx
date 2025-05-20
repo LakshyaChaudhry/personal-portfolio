@@ -29,8 +29,6 @@ export default function App() {
         <Experience />
       </div>
       
-
-
     </div>
     
     </>
