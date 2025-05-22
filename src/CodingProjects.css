@@ -1,13 +1,22 @@
 /* This page styles the CodingProjects component */
 
+/* Centers everything under .page-section (you already have this) */
 .page-section {
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    width: 100vw;
-    height: 100vh;
-    scroll-snap-align: start;
-    background-color: #f0f0f0; /* Light gray background */
-    color: #333; /* Dark text color */
-}
+    min-height: 100vh;
+    padding-block: 7rem 4rem;      /* keeps navbar clear */
+    text-align: center;
+  }
+  /* Headings / sub-headings */
+  .title    { font-size: clamp(2rem, 5vw, 3rem); font-weight: 700; }
+  .subtitle { margin-top: .5rem;   color: #666; }
+  
+  /* The responsive Masonry-ish grid */
+  .projects-grid {
+    margin: 5rem auto 0;
+    max-width: 1200px;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap: 2rem;
+    padding-inline: 1rem;
+  }
+  
