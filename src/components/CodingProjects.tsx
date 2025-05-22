@@ -10,7 +10,7 @@ import "../CodingProjects.css";                         // keep any custom style
  * const accent = getComputedStyle(document.documentElement)
  *                 .getPropertyValue("--accent");
  */
-const ACCENT_COLOUR = "#0D6EFD";
+//const ACCENT_COLOUR = "#0D6EFD";
 
 export default function CodingProjects() {
   return (
@@ -24,7 +24,7 @@ export default function CodingProjects() {
           <ProjectCard
             key={proj.id}
             project={proj}
-            accent={ACCENT_COLOUR}
+            //accent={ACCENT_COLOUR}
           />
         ))}
       </div>

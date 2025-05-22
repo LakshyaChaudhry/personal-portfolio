@@ -7,12 +7,8 @@ import type { project } from "../data/projects.tsx";
 
 interface ProjectCardProps {
   project: project;
-  accent?: string;          // default falls back to logo blue
+  accent?: string;
 }
-
-/* ────────────────────────────────────────────────────────────────────────── */
-/* Styling helpers                                                           */
-/* ────────────────────────────────────────────────────────────────────────── */
 
 const CARD_BASE =
   "group cursor-pointer select-none rounded-2xl p-6 backdrop-blur-md " +
@@ -22,18 +18,11 @@ const CARD_BASE =
 const TAG_STYLE =
   "rounded-full bg-white/10 px-3 py-1 text-xs text-white/70 whitespace-nowrap";
 
-/* ────────────────────────────────────────────────────────────────────────── */
-/* Animation presets                                                         */
-/* ────────────────────────────────────────────────────────────────────────── */
-
 const bodyVariants: Variants = {
   collapsed: { opacity: 0, height: 0 },
   expanded:  { opacity: 1, height: "auto" },
 };
 
-/* ────────────────────────────────────────────────────────────────────────── */
-/* Component                                                                 */
-/* ────────────────────────────────────────────────────────────────────────── */
 
 export default function ProjectCard({
   project,
@@ -43,7 +32,6 @@ export default function ProjectCard({
 
   const toggle = () => setIsOpen(!isOpen);
 
-  // Keep ⌘/Ctrl-click on the “Repo” link from toggling the card
   const stopBounce = (e: MouseEvent) => e.stopPropagation();
 
   return (
