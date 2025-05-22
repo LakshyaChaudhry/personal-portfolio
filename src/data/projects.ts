@@ -1,22 +1,25 @@
-export type project = {
+export interface Project {
     id: string;
     title: string;
-    tagline: string;
-    description: string;
-    image: string;
-    stack: string[];
-    link?: string;
+    shortDescription: string;
+    fullDescription: string;
+    technologies: string[];
+    githubLink: string;
+    liveLink?: string;
+    imageUrl?: string;
+    color: string;
 };
 
-export const projects: project[] = [
+export const projects: Project[] = [
     {
-        id: "pdf-extractor",
-        title: "PDF Extractor LLM",
-        tagline: "Parse any SDS & ask it questions",
-        description:
-          "Fine-tuned pdfplumber & OpenAI functions to build a QA layer over non-standard PDFs. Handles tables, scanned text and noisy OCR.",
-        image: '',
-        stack: ["Python", "LangChain", "FastAPI"],
-        link: "https://github.com/…",
+        id: '1',
+        title: "Corteva SDS & Label Extractor LLM",
+        shortDescription: "LLM-powered PDF extraction tool",
+        fullDescription:"Fine-tuned pdfplumber & OpenAI functions to build a QA layer over non-standard PDFs. Handles tables, scanned text and noisy OCR.",
+        technologies: ["Python", "LangChain", "FastAPI"],
+        githubLink: "https://github.com/…",
+        liveLink: "",
+        imageUrl: "https://example.com/image1.jpg",
+        color: "#FF5733",
       },
  ];
