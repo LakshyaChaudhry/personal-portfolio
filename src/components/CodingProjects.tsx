@@ -1,11 +1,12 @@
 //import react from 'react';
 import ProjectCard from './ProjectCard';
 import { projects } from '../data/projects';
+import '../CodingProjects.css';
 
 const CodingProjects: React.FC = () => {
     return (
         <div className="page-section">
-            <h1 className="text-5xl font-bold text-white text-center mb-12">
+            <h1 className="title">
                 Projects
             </h1>
 

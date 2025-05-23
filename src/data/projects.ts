@@ -20,6 +20,6 @@ export const projects: Project[] = [
         githubLink: "https://github.com/…",
         liveLink: "",
         imageUrl: "https://example.com/image1.jpg",
-        color: "#FF5733",
+        color: "from-orange-500 to-red-600",
       },
  ];

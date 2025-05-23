@@ -1,19 +1,90 @@
-/* This page styles the CodingProjects component */
-
+/* Your existing styles */
 .page-section {
     min-height: 100vh;
     padding-block: 7rem 4rem; 
     text-align: center;
-  }
-  .title    { font-size: clamp(2rem, 5vw, 3rem); font-weight: 700; }
-  .subtitle { margin-top: .5rem;   color: #666; }
+}
 
-  .projects-grid {
+.title { 
+    font-size: clamp(2rem, 5vw, 3rem); 
+    font-weight: 700; 
+    color: white;  /* Add this line */
+    text-align: center;  /* Add this line */
+    margin-bottom: 3rem;  /* Add this line */
+}
+
+.subtitle { 
+    margin-top: .5rem;   
+    color: #666; 
+}
+
+.projects-grid {
     margin: 5rem auto 0;
     max-width: 1200px;
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
     gap: 2rem;
     padding-inline: 1rem;
-  }
-  
+}
+
+/* Add the new ProjectCard styles here */
+.project-card {
+  position: relative;
+  cursor: pointer;
+  transition: transform 0.3s ease;
+}
+
+.project-card:hover {
+  transform: scale(1.05);
+}
+
+.project-card-gradient {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to right, #f97316, #dc2626);
+  border-radius: 1rem;
+  filter: blur(24px);
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.project-card:hover .project-card-gradient {
+  opacity: 0.6;
+}
+
+.project-card-content {
+  position: relative;
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(16px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 1rem;
+  padding: 1.5rem;
+  height: 12rem;
+  color: white;
+}
+
+.project-title {
+  font-size: 1.5rem;
+  font-weight: bold;
+  margin-bottom: 0.5rem;
+  color: white;
+}
+
+.project-description {
+  color: #d1d5db;
+  margin-bottom: 1rem;
+}
+
+.project-technologies {
+  position: absolute;
+  bottom: 1rem;
+  left: 1.5rem;
+  right: 1.5rem;
+  display: flex;
+  gap: 0.5rem;
+}
+
+.tech-tag {
+  font-size: 0.75rem;
+  color: #9ca3af;
+}
