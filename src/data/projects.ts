@@ -22,4 +22,16 @@ export const projects: Project[] = [
         imageUrl: "https://example.com/image1.jpg",
         color: "from-orange-500 to-red-600",
       },
+
+      {
+        id: '2',
+        title: "Portfolio Website",
+        shortDescription: "My personal portfolio website",
+        fullDescription:"A personal portfolio website built with React, TypeScript, and Tailwind CSS. Showcases my projects and skills.",
+        technologies: ["React", "TypeScript", "Tailwind CSS"],
+        githubLink: "https://github.com/…",
+        liveLink: "",
+        imageUrl: "https://example.com/image1.jpg",
+        color: "from-orange-500 to-red-600",
+      },
  ];
