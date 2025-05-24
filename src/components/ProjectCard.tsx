@@ -6,7 +6,6 @@ interface ProjectCardProps {
 }
 
 const ProjectCard: React.FC<ProjectCardProps> = ({ project }) => {
-    // State to track if this card is expanded
     const [isExpanded, setIsExpanded] = useState(false);
 
     return (
@@ -48,6 +47,9 @@ const ProjectCard: React.FC<ProjectCardProps> = ({ project }) => {
                     
                     {/* Expanded Content Modal */}
                     <div className="modal-container">
+                        {/* Gradient effect for expanded modal */}
+                        <div className="modal-gradient" />
+                        
                         <div className="modal-content">
                             {/* Close Button */}
                             <button 
