@@ -9,13 +9,13 @@ function Navigation() {
                     <a href="#homepage">Home</a>
                 </li>
                 <li>
-                    <a href="#codingProjects">Coding Projects</a>
-                </li>
-                <li>
-                    <a href="#blog">Blog</a>
+                    <a href="#codingProjects">Projects</a>
                 </li>
                 <li>
                     <a href="#experience">Experience</a>
+                </li>
+                <li>
+                    <a href="#blog">Blog</a>
                 </li>
             </ul>
         </nav>

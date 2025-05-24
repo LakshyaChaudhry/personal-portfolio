@@ -22,13 +22,14 @@ export default function App() {
       <div id="codingProjects">
         <CodingProjects />
       </div>
-      <div id="blog">
-        <Blog />
-      </div>
+      
       <div id="experience">
         <Experience />
       </div>
       
+      <div id="blog">
+        <Blog />
+      </div>
     </div>
     
     </>
