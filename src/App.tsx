@@ -1,39 +1,40 @@
-// This is a simple React component that displays a greeting message.
-// It uses Tailwind CSS for styling and is set up to be used with Vite.
-// This is also my first react component!
-
-import React from "react";
 import HomePage from "./components/HomePage";
 import CodingProjects from "./components/CodingProjects";
 import Blog from "./components/Blog";
 import Navigation from "./components/Navigation";
-import "./App.css";
 import Experience from "./components/Experience";
-// import TailwindV4Test from "./components/TailwindV4Test";
 
 export default function App() {
   return (
     <>
-    <Navigation />
+      <Navigation />
 
-    <div className="horizontal-scroll-container">
-      <div id="homepage">
-        <HomePage />
+      {/* horizontal carousel */}
+      <div
+        data-hide-scrollbar                /* hides WebKit track */
+        className="
+          flex overflow-x-auto
+          snap-x snap-mandatory
+          h-screen w-screen scroll-smooth
+          [scrollbar-width:none]           /* hides Firefox track */
+        "
+      >
+        <section id="homepage"   className="flex-none w-screen h-screen snap-start">
+          <HomePage />
+        </section>
+
+        <section id="codingProjects" className="flex-none w-screen h-screen snap-start">
+          <CodingProjects />   {/* already wrapped with w-screen/h-screen/snap-start */}
+        </section>
+
+        <section id="experience" className="flex-none w-screen h-screen snap-start">
+          <Experience />
+        </section>
+
+        <section id="blog"       className="flex-none w-screen h-screen snap-start">
+          <Blog />
+        </section>
       </div>
-      <div id="codingProjects">
-        <CodingProjects />
-      </div>
-      
-      <div id="experience">
-        <Experience />
-      </div>
-      
-      <div id="blog">
-        <Blog />
-      </div>
-    </div>
-    
     </>
   );
-
 }
