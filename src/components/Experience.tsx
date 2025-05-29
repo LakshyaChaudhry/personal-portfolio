@@ -4,10 +4,9 @@ import Component from './timeline.tsx';
 
 function Experience() {
     return (
-        <div className="page-section">
+        <div className='page-section'>
+            <h1 className="mb-4 text-4xl font-bold text-black sm:text-5xl"> Experience </h1>
             <Component />
-            <h1> Experience </h1>
-            <p>This is a showcase of my work experience</p>
         </div>
     );
 }
