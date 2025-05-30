@@ -1,9 +1,10 @@
-// src/components/ProjectCard.tsx
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import type { Project } from '../data/projects';
 
-interface Props { project: Project }
+interface Props {
+  project: Project;
+}
 
 const ProjectCard: React.FC<Props> = ({ project }) => {
   const [isOpen, setOpen] = useState(false);
@@ -19,19 +20,23 @@ const ProjectCard: React.FC<Props> = ({ project }) => {
         className="group relative cursor-pointer transition-transform duration-300"
       >
         {/* glow */}
-        <div className="absolute inset-0 -z-10 rounded-xl bg-gradient-to-r from-orange-500 to-red-600 blur-3xl opacity-0 transition-opacity duration-300 group-hover:opacity-60" />
+        <div className="absolute inset-0 -z-10 rounded-xl bg-gradient-to-r from-orange-500 to-red-600 blur-3xl opacity-10 transition-opacity duration-300 group-hover:opacity-80" />
 
-        {/* card body */}
-        <div className="relative h-48 rounded-xl border border-white/20 bg-white/10 p-6 text-black backdrop-blur-lg">
+        {/* card body –⬇ key tweaks */}
+        <div
+          className="relative h-48 rounded-xl border border-white/30 bg-white/25 p-6 text-black shadow-md shadow-black/10 backdrop-blur-xl"
+        >
           <h3 className="mb-2 text-2xl font-bold">{project.title}</h3>
-          <p className="mb-4 text-gray-600">{project.shortDescription}</p>
+          <p className="mb-4 text-gray-700/90 dark:text-gray-300">
+            {project.shortDescription}
+          </p>
 
-          <div className="absolute bottom-4 left-6 right-6 flex gap-2">
+          <div className="absolute bottom-4 left-6 right-6 flex flex-wrap gap-2">
             {project.technologies.slice(0, 3).map((t) => (
               <motion.span
                 key={t}
                 whileHover={{ scale: 1.1 }}
-                className="text-xs"
+                className="text-xs text-gray-800 dark:text-gray-200"
               >
                 {t}
               </motion.span>
@@ -43,13 +48,15 @@ const ProjectCard: React.FC<Props> = ({ project }) => {
         </div>
       </motion.div>
 
-      {/* ⤵ modal */}
+      {/* ⤵ modal – unchanged */}
       <AnimatePresence>
         {isOpen && (
           <>
             {/* backdrop */}
             <motion.div
-              initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
               transition={{ duration: 0.3 }}
               onClick={() => setOpen(false)}
               className="fixed inset-0 z-40 bg-black/80"
@@ -57,15 +64,17 @@ const ProjectCard: React.FC<Props> = ({ project }) => {
 
             {/* container */}
             <motion.div
-              initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
               transition={{ duration: 0.4 }}
               className="fixed inset-0 z-50 flex items-center justify-center p-8 [perspective:1000px]"
             >
               {/* modal panel */}
               <motion.div
                 initial={{ scale: 0.8, opacity: 0, y: 50, rotateX: -15 }}
-                animate={{ scale: 1,   opacity: 1, y: 0,  rotateX: 0  }}
-                exit={{   scale: 0.8, opacity: 0, y: -50, rotateX: 15 }}
+                animate={{ scale: 1, opacity: 1, y: 0, rotateX: 0 }}
+                exit={{ scale: 0.8, opacity: 0, y: -50, rotateX: 15 }}
                 transition={{ duration: 0.5, ease: [0.25, 0.46, 0.45, 0.94] }}
                 whileHover={{ scale: 1.02 }}
                 className="relative w-full max-w-3xl max-h-[90vh] overflow-y-auto rounded-3xl border border-white/20 bg-white/10 p-8 backdrop-blur-lg [transform-style:preserve-3d]"
@@ -106,7 +115,10 @@ const ProjectCard: React.FC<Props> = ({ project }) => {
                         initial={{ opacity: 0, scale: 0.8 }}
                         animate={{ opacity: 1, scale: 1 }}
                         transition={{ duration: 0.3 }}
-                        whileHover={{ scale: 1.1, backgroundColor: "rgba(255,255,255,0.3)" }}
+                        whileHover={{
+                          scale: 1.1,
+                          backgroundColor: 'rgba(255,255,255,0.3)',
+                        }}
                         className="cursor-pointer rounded-full bg-white/20 px-3 py-2 text-sm text-white"
                       >
                         {t}

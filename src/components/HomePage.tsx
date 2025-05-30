@@ -39,7 +39,7 @@ function HomePage() {
   }, [hasTypedName, subtitleText, subtitleFull, hasTypedSubtitle]);
 
   return (
-    <div className="flex-none w-screen min-h-screen scroll-snap-start flex flex-col justify-center items-center bg-gradient-to-br from-white to-gray-100 px-4 py-8">
+    <div className="flex-none w-screen min-h-screen scroll-snap-start flex flex-col justify-center items-center bg-gradient-to-br px-4 py-8">
       <div className="hidden lg:flex items-center justify-center w-full max-w-7xl gap-16">
         {/* 3D model */}
         <div className="flex-1 max-w-2xl">
@@ -51,7 +51,7 @@ function HomePage() {
         <div className="flex-1 max-w-xl">
           <div className="text-left">
             <h1
-              className="text-6xl xl:text-7xl font-light text-gray-900 mb-2 leading-tight"
+              className="text-6xl xl:text-7xl font-medium text-gray-900 mb-2 leading-tight"
               style={{ fontFamily: 'RobotoRegular, sans-serif' }}
             >
               {nameText}
