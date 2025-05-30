@@ -117,65 +117,109 @@ function TimelineHeader({
   )
 }
 
-// TimelineIndicator
+// TimelineIndicator - Enhanced to support logos
 interface TimelineIndicatorProps extends React.HTMLAttributes<HTMLDivElement> {
   asChild?: boolean
+  logo?: string
+  company?: string
+  current?: boolean
 }
 
 function TimelineIndicator({
-  //asChild = false,
   className,
   children,
+  logo,
+  company,
+  current = false,
   ...props
 }: TimelineIndicatorProps) {
   return (
     <div
       data-slot="timeline-indicator"
       className={cn(
-        "border-primary/20 group-data-completed/timeline-item:border-primary absolute size-4 rounded-full border-2 group-data-[orientation=horizontal]/timeline:-top-6 group-data-[orientation=horizontal]/timeline:left-0 group-data-[orientation=horizontal]/timeline:-translate-y-1/2 group-data-[orientation=vertical]/timeline:top-0 group-data-[orientation=vertical]/timeline:-left-6 group-data-[orientation=vertical]/timeline:-translate-x-1/2",
+        "flex items-center justify-center rounded-full border-2 bg-white shadow-lg transition-all duration-500",
+        current ? "size-12 border-blue-500 ring-4 ring-blue-100" : "size-10 border-gray-300",
         className
       )}
       aria-hidden="true"
       {...props}
     >
+      {logo ? (
+        <img 
+          src={logo} 
+          alt={`${company} logo`}
+          className="rounded-full object-cover"
+          style={{ width: current ? '32px' : '28px', height: current ? '32px' : '28px' }}
+          onError={(e) => {
+            const target = e.target as HTMLImageElement;
+            target.style.display = 'none';
+            const nextElement = target.nextElementSibling as HTMLElement;
+            if (nextElement) {
+              nextElement.style.display = 'flex';
+            }
+          }}
+        />
+      ) : null}
       {children}
     </div>
   )
 }
 
-// TimelineItem
+// TimelineItem - Enhanced with animation support
 interface TimelineItemProps extends React.HTMLAttributes<HTMLDivElement> {
   step: number
+  isVisible?: boolean
+  index?: number
 }
 
-function TimelineItem({ step, className, ...props }: TimelineItemProps) {
+function TimelineItem({ 
+  step, 
+  className, 
+  isVisible = true, 
+  index = 0,
+  ...props 
+}: TimelineItemProps) {
   const { activeStep } = useTimeline()
 
   return (
     <div
       data-slot="timeline-item"
       className={cn(
-        "group/timeline-item has-[+[data-completed]]:[&_[data-slot=timeline-separator]]:bg-primary relative flex flex-1 flex-col gap-0.5 group-data-[orientation=horizontal]/timeline:mt-8 group-data-[orientation=horizontal]/timeline:not-last:pe-8 group-data-[orientation=vertical]/timeline:ms-8 group-data-[orientation=vertical]/timeline:not-last:pb-12",
+        "group/timeline-item has-[+[data-completed]]:[&_[data-slot=timeline-separator]]:bg-primary relative flex flex-1 flex-col gap-0.5 transition-all duration-700 ease-out group-data-[orientation=horizontal]/timeline:mt-8 group-data-[orientation=horizontal]/timeline:not-last:pe-8 group-data-[orientation=vertical]/timeline:ms-8 group-data-[orientation=vertical]/timeline:not-last:pb-12",
+        isVisible 
+          ? 'opacity-100 translate-x-0' 
+          : 'opacity-0 translate-x-8',
         className
       )}
+      style={{ 
+        transitionDelay: `${index * 200}ms` 
+      }}
       data-completed={step <= activeStep || undefined}
       {...props}
     />
   )
 }
 
-// TimelineSeparator
+// TimelineSeparator - Enhanced with animation
 function TimelineSeparator({
   className,
+  isVisible = true,
+  index = 0,
   ...props
-}: React.HTMLAttributes<HTMLDivElement>) {
+}: React.HTMLAttributes<HTMLDivElement> & { isVisible?: boolean, index?: number }) {
   return (
     <div
       data-slot="timeline-separator"
       className={cn(
-        "bg-primary/10 absolute self-start group-last/timeline-item:hidden group-data-[orientation=horizontal]/timeline:-top-6 group-data-[orientation=horizontal]/timeline:h-0.5 group-data-[orientation=horizontal]/timeline:w-[calc(100%-1rem-0.25rem)] group-data-[orientation=horizontal]/timeline:translate-x-4.5 group-data-[orientation=horizontal]/timeline:-translate-y-1/2 group-data-[orientation=vertical]/timeline:-left-6 group-data-[orientation=vertical]/timeline:h-[calc(100%-1rem-0.25rem)] group-data-[orientation=vertical]/timeline:w-0.5 group-data-[orientation=vertical]/timeline:-translate-x-1/2 group-data-[orientation=vertical]/timeline:translate-y-4.5",
+        "absolute left-5 w-0.5 bg-gray-300 transition-all duration-1000 ease-out",
+        isVisible ? 'h-full' : 'h-0',
         className
       )}
+      style={{ 
+        top: '48px', // Start below the indicator
+        bottom: '-48px', // Extend to next indicator
+        transitionDelay: `${index * 200 + 600}ms` 
+      }}
       aria-hidden="true"
       {...props}
     />

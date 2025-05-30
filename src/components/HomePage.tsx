@@ -12,6 +12,9 @@ function HomePage() {
             <div style={{ width: '100vw', height: '80vh'}}>
                 <LCViewer />
             </div>
+            <h1 className="mb-4 text-4xl font-bold text-black sm:text-5xl">
+                Lakshya Chaudhry
+            </h1>
 
         </div>
 
