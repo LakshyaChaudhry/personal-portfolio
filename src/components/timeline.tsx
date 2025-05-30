@@ -103,7 +103,7 @@ export default function Component() {
               <div
                 className={`flex items-center justify-center rounded-full border-2 bg-white shadow-lg transition-all duration-500 z-10 ${
                   item.current 
-                    ? 'w-12 h-12 border-blue-500 ring-4 ring-blue-100' 
+                    ? 'w-12 h-12 border-orange-500 ring-4 ring-blue-100' 
                     : 'w-10 h-10 border-gray-300'
                 }`}
               >
@@ -152,7 +152,7 @@ export default function Component() {
               
               {/* Company and Location Info */}
               <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-6 mb-4">
-                <div className="flex items-center gap-2 text-blue-600 font-semibold">
+                <div className="flex items-center gap-2 text-orange-600 font-semibold">
                   <Building2 size={16} />
                   <span className="text-base">{item.company}</span>
                 </div>

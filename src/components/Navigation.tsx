@@ -5,7 +5,7 @@ function Navigation() {
         { href: '#homepage', label: 'Home' },
         { href: '#codingProjects', label: 'Projects' },
         { href: '#experience', label: 'Experience' },
-        { href: '#blog', label: 'Blog' },
+        { href: '#blog', label: 'About' },
     ];
 
     return ( 

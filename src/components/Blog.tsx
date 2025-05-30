@@ -4,8 +4,8 @@ import '../Blog.css';
 function Blog() {
     return (
         <div className="page-section">
-            <h1> Blog </h1>
-            <p>This is a collection of my blog posts</p>
+            <h1> About Me </h1>
+            <p>This is a section about me</p>
         </div>
     );
 }
