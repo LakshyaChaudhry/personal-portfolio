@@ -1,18 +1,18 @@
 import React from 'react';
 import { Mail, Github, Twitter, Linkedin } from 'lucide-react';
+import headshot from '../assets/headshot.jpeg'; // Adjust the path as necessary
 
-// Replace these with your actual information
 const aboutData = {
   name: "Lakshya Chaudhry",
   title: "AI @ Purdue",
-  profileImage: "https://via.placeholder.com/280x280/4F46E5/white?text=Your+Photo", // Replace with your actual photo
-  description: "Passionate full-stack developer with 3+ years of experience building modern web applications. I love creating user-friendly interfaces and solving complex problems with clean, efficient code.",
-  skills: ["React", "TypeScript", "Node.js", "Python", "PostgreSQL", "AWS"],
+  profileImage: headshot, 
+  description: "Hi My name is Lakshya Chaudhry, I'm studying Artificial Intelligence at Purdue University with a strong focus on leveraging AI and software for impactful, real-world applications. My interests span AI research, quant roles, and software engineering, where I’m committed to developing innovative solutions that make a difference.",
+  skills: ["React", "TypeScript", "Node.js", "Python", "Tailwind CSS", "AWS", "Azure"],
   social: {
-    linkedin: "https://linkedin.com/in/yourprofile",
-    github: "https://github.com/yourusername", 
+    linkedin: "www.linkedin.com/in/lakshya-chaudhry-a0155a311",
+    github: "https://github.com/LakshyaChaudhry", 
     twitter: "https://twitter.com/yourusername",
-    email: "mailto:your.email@example.com"
+    email: "lakshchaudhry@gmail.com"
   }
 };
 

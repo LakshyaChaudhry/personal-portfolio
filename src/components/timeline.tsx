@@ -1,57 +1,69 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Building2, Calendar, MapPin } from 'lucide-react';
-// import {
-//   Timeline,
-//   TimelineContent,
-//   TimelineDate,
-//   TimelineHeader,
-//   TimelineIndicator,
-//   TimelineItem,
-//   TimelineSeparator,
-//   TimelineTitle,
-// } from "@/components/ui/timeline"
+
 
 const items = [
   {
     id: 1,
-    date: "Jan 2024 - Present",
-    title: "Senior Software Engineer",
-    company: "Tech Corp",
+    date: "June 2025 - Present",
+    title: "SWE Intern",
+    company: "TrustCircle",
     location: "San Francisco, CA",
-    description: "Led development of React-based dashboard serving 10k+ users. Implemented modern state management and optimized performance by 40%.",
+    description: "Incoming summer 2025 SWE Intern.",
     logo: "https://via.placeholder.com/40x40/4F46E5/white?text=TC",
     current: true
   },
   {
     id: 2,
-    date: "Jun 2022 - Dec 2023",
-    title: "Frontend Developer",
-    company: "StartupCo",
-    location: "Remote",
-    description: "Built responsive web applications using React and TypeScript. Collaborated with design team to implement pixel-perfect UI components.",
+    date: "Jan 2025 - May 2025",
+    title: "Campus Strategist",
+    company: "Perplexity",
+    location: "San Francisco, CA",
+    description: "Led growth of the Perplexity platform in the midwest region and Purdue community, grew user base by thousands. Developed and executed marketing strategies to increase brand awareness and user engagement.",
+    logo: "https://via.placeholder.com/40x40/4F46E5/white?text=TC",
+    current: true
+  },
+  {
+    id: 3,
+    date: "August 2024 - May 2025",
+    title: "AI/LLM Researcher + Engineer",
+    company: "Corteva",
+    location: "Contract",
+    description: "Worked on a team to develop an LLM-powered PDF extraction tool for Safety Data Sheets (SDS) and Crop Protection Labels. Fine-tuned open-source models to process non-standardized PDF formats, creating a structured database. Developed an AI-powered API for natural language queries.",
     logo: "https://via.placeholder.com/40x40/059669/white?text=SC",
     current: false
   },
   {
-    id: 3,
-    date: "Aug 2021 - May 2022",
-    title: "Junior Developer",
-    company: "WebAgency", 
-    location: "New York, NY",
-    description: "Developed client websites using modern web technologies. Gained experience in full-stack development and agile methodologies.",
+    id: 4,
+    date: "Aug 2024 - May 2025",
+    title: "Undergaduate Data Science Researcher",
+    company: "Data Mine @ Purdue University", 
+    location: "Indianapolis, IN",
+    description: "Contracted on the Cortvea Project",
     logo: "https://via.placeholder.com/40x40/DC2626/white?text=WA",
     current: false
   },
   {
-    id: 4,
-    date: "Jan 2021 - Jul 2021",
-    title: "Web Development Intern",
-    company: "Digital Solutions",
-    location: "Boston, MA", 
-    description: "Assisted in building e-commerce platforms. Learned industry best practices and modern development workflows.",
+    id: 5,
+    date: "Jan 2023 - Present",
+    title: "Global Youth Ambassador & Advisory to Global Board Member",
+    company: "Foundation for the support of the United Nations",
+    location: "New York, NY",
+    description: "Advising the Global Board on youth engagement strategies and initiatives. Collaborating with global leaders to promote sustainable development goals and youth empowerment.", 
     logo: "https://via.placeholder.com/40x40/7C3AED/white?text=DS",
     current: false
-  }
+  },
+  {
+    id: 6,
+    date: "June 2022 - August 2022",
+    title: "Software Engineer Intern",
+    company: "TrustCircle",
+    location: "San Francisco, CA",
+    description: "Shadowed the Director of Engineering at TrustCircle, aided in AI/ML research, and implemented Semantic Search models that helped identify at-risk students and the roots of risk proactively. The model integration led to 2X increase in efficiency in addressing students in need by generating a summarized data analysis report for school counselors.", 
+    logo: "https://via.placeholder.com/40x40/7C3AED/white?text=DS",
+    current: false
+  },
+
 ];
 
 export default function Component() {
