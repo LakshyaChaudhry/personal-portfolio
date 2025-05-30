@@ -3,7 +3,7 @@ import Component from './timeline.tsx';
 
 function Experience() {
     return (
-        <div className="flex-none w-screen min-h-screen scroll-snap-start flex flex-col justify-start items-center bg-gray-100 py-24 px-4">
+        <div className="flex-none w-screen min-h-screen scroll-snap-start flex flex-col justify-start items-center py-24 px-4">
             <div className="text-center mb-12 max-w-4xl">
                 <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-gray-900 mb-4 leading-tight">
                     Professional Experience
