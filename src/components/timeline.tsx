@@ -56,7 +56,7 @@ const items = [
     location: "New York, NY",
     description: "Advising the Global Board on youth engagement strategies and initiatives. Collaborating with global leaders to promote sustainable development goals and youth empowerment.", 
     logo: fsun,
-    current: false
+    current: true
   },
   {
     id: 6,
