@@ -7,10 +7,10 @@ const aboutData = {
   description: "Hi My name is Lakshya Chaudhry, I'm studying Artificial Intelligence at Purdue University with a strong focus on leveraging machine learning and software for impactful, real-world applications. My interests span AI research, quant roles, and software engineering, where I’m committed to developing innovative solutions that make a difference.",
   skills: ["React", "TypeScript", "Node.js", "Python", "Tailwind CSS", "AWS", "Azure"],
   social: {
-    linkedin: "www.linkedin.com/in/lakshya-chaudhry-a0155a311",
+    linkedin: "https://www.linkedin.com/in/lakshya-chaudhry-a0155a311",
     github: "https://github.com/LakshyaChaudhry", 
-    twitter: "https://twitter.com/yourusername",
-    email: "lakshchaudhry@gmail.com"
+    twitter: "https://x.com/LakshChaudhry",
+    email: "mailto:lakshchaudhry@gmail.com"
   }
 };
 

@@ -8,7 +8,7 @@ function Experience() {
                     Professional Experience
                 </h1>
                 <p className="text-lg md:text-xl text-gray-600 leading-relaxed max-w-2xl mx-auto">
-                    My journey through various roles and companies, building expertise step by step.
+                    Roles, challenges, and experiences that shaped my skills and perspective.
                 </p>
             </div>
             

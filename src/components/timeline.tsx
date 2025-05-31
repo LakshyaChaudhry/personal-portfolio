@@ -38,7 +38,7 @@ const items = [
     title: "Undergaduate Data Science Researcher",
     company: "Data Mine @ Purdue University", 
     location: "Indianapolis, IN",
-    description: "Contracted on the Cortvea Project",
+    description: "Data wrangling, visualization, and modeling in R, Python; Contracted on the Cortvea Project",
     logo: '/assets/datamine.png',
     current: false
   },
