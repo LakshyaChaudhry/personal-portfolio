@@ -1,11 +1,5 @@
-import React, { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Building2, Calendar, MapPin } from 'lucide-react';
-import corteva from '../assets/corteva.png';
-import datamine from '../assets/datamine.png';
-import perplexity from '../assets/perplexity.png';
-import trustcircle from '../assets/trustcircle.png';
-import fsun from '../assets/fsun.png';
-
 
 const items = [
   {
@@ -15,7 +9,7 @@ const items = [
     company: "TrustCircle",
     location: "San Francisco, CA",
     description: "Incoming summer 2025 SWE Intern.",
-    logo: trustcircle,
+    logo: '../assets/trustcircle.png',
     current: true
   },
   {
@@ -25,7 +19,7 @@ const items = [
     company: "Perplexity",
     location: "San Francisco, CA",
     description: "Led growth of the Perplexity platform in the midwest region and Purdue community, grew user base by thousands. Developed and executed marketing strategies to increase brand awareness and user engagement.",
-    logo: perplexity,
+    logo: '../assets/perplexity.png',
     current: false
   },
   {
@@ -35,7 +29,7 @@ const items = [
     company: "Corteva",
     location: "Contract",
     description: "Worked on a team to develop an LLM-powered PDF extraction tool for Safety Data Sheets (SDS) and Crop Protection Labels. Fine-tuned open-source models to process non-standardized PDF formats, creating a structured database. Developed an AI-powered API for natural language queries.",
-    logo: corteva,
+    logo: '../assets/corteva.png',
     current: false
   },
   {
@@ -45,7 +39,7 @@ const items = [
     company: "Data Mine @ Purdue University", 
     location: "Indianapolis, IN",
     description: "Contracted on the Cortvea Project",
-    logo: datamine,
+    logo: '../assets/datamine.png',
     current: false
   },
   {
@@ -55,7 +49,7 @@ const items = [
     company: "Foundation for the support of the United Nations",
     location: "New York, NY",
     description: "Advising the Global Board on youth engagement strategies and initiatives. Collaborating with global leaders to promote sustainable development goals and youth empowerment.", 
-    logo: fsun,
+    logo: '../assets/fsun.png',
     current: true
   },
   {
@@ -65,7 +59,7 @@ const items = [
     company: "TrustCircle",
     location: "San Francisco, CA",
     description: "Shadowed the Director of Engineering at TrustCircle, aided in AI/ML research, and implemented Semantic Search models that helped identify at-risk students and the roots of risk proactively. The model integration led to 2X increase in efficiency in addressing students in need by generating a summarized data analysis report for school counselors.", 
-    logo: trustcircle,
+    logo: '../assets/trustcircle.png',
     current: false
   },
 

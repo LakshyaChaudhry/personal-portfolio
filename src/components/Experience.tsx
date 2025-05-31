@@ -1,4 +1,3 @@
-import React from 'react';
 import Component from './timeline.tsx';
 
 function Experience() {

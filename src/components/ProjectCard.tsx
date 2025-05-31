@@ -48,7 +48,6 @@ const ProjectCard: React.FC<Props> = ({ project }) => {
         </div>
       </motion.div>
 
-      {/* ⤵ modal – unchanged */}
       <AnimatePresence>
         {isOpen && (
           <>

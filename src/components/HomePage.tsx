@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import LCViewer from './LCViewer';
 
 const TYPING_SPEED = 100;
