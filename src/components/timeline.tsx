@@ -9,7 +9,7 @@ const items = [
     company: "TrustCircle",
     location: "San Francisco, CA",
     description: "Incoming summer 2025 SWE Intern.",
-    logo: '../assets/trustcircle.png',
+    logo: '/assets/trustcircle.png',
     current: true
   },
   {
@@ -19,7 +19,7 @@ const items = [
     company: "Perplexity",
     location: "San Francisco, CA",
     description: "Led growth of the Perplexity platform in the midwest region and Purdue community, grew user base by thousands. Developed and executed marketing strategies to increase brand awareness and user engagement.",
-    logo: '../assets/perplexity.png',
+    logo: '/assets/perplexity.png',
     current: false
   },
   {
@@ -29,7 +29,7 @@ const items = [
     company: "Corteva",
     location: "Contract",
     description: "Worked on a team to develop an LLM-powered PDF extraction tool for Safety Data Sheets (SDS) and Crop Protection Labels. Fine-tuned open-source models to process non-standardized PDF formats, creating a structured database. Developed an AI-powered API for natural language queries.",
-    logo: '../assets/corteva.png',
+    logo: '/assets/corteva.png',
     current: false
   },
   {
@@ -39,7 +39,7 @@ const items = [
     company: "Data Mine @ Purdue University", 
     location: "Indianapolis, IN",
     description: "Contracted on the Cortvea Project",
-    logo: '../assets/datamine.png',
+    logo: '/assets/datamine.png',
     current: false
   },
   {
@@ -49,7 +49,7 @@ const items = [
     company: "Foundation for the support of the United Nations",
     location: "New York, NY",
     description: "Advising the Global Board on youth engagement strategies and initiatives. Collaborating with global leaders to promote sustainable development goals and youth empowerment.", 
-    logo: '../assets/fsun.png',
+    logo: '/assets/fsun.png',
     current: true
   },
   {
@@ -59,7 +59,7 @@ const items = [
     company: "TrustCircle",
     location: "San Francisco, CA",
     description: "Shadowed the Director of Engineering at TrustCircle, aided in AI/ML research, and implemented Semantic Search models that helped identify at-risk students and the roots of risk proactively. The model integration led to 2X increase in efficiency in addressing students in need by generating a summarized data analysis report for school counselors.", 
-    logo: '../assets/trustcircle.png',
+    logo: '/assets/trustcircle.png',
     current: false
   },
 
