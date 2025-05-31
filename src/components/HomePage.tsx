@@ -11,6 +11,24 @@ function HomePage() {
   const [subtitleText, setSubtitleText] = useState('');
   const [hasTypedName, setHasTypedName] = useState(false);
   const [hasTypedSubtitle, setHasTypedSubtitle] = useState(false);
+  const [viewerKey, setViewerKey] = useState(0);
+
+  // Force re-render of 3D viewer on significant resize
+  useEffect(() => {
+    let resizeTimer: ReturnType<typeof setTimeout>;
+    const handleResize = () => {
+      clearTimeout(resizeTimer);
+      resizeTimer = setTimeout(() => {
+        setViewerKey(prev => prev + 1);
+      }, 300); // Debounce resize
+    };
+
+    window.addEventListener('resize', handleResize);
+    return () => {
+      window.removeEventListener('resize', handleResize);
+      clearTimeout(resizeTimer);
+    };
+  }, []);
 
   useEffect(() => {
     if (nameText.length < nameFull.length) {
@@ -40,56 +58,34 @@ function HomePage() {
 
   return (
     <div className="flex-none w-screen min-h-screen scroll-snap-start flex flex-col justify-center items-center bg-gradient-to-br px-4 py-8">
-      <div className="hidden lg:flex items-center justify-center w-full max-w-7xl gap-16">
-        {/* 3D model */}
-        <div className="flex-1 max-w-2xl">
-          <div style={{ width: '100%', height: '70vh', minHeight: '500px' }}>
-            <LCViewer />
+      <div className="w-full max-w-7xl">
+        <div className="flex flex-col lg:flex-row items-center justify-center gap-8 lg:gap-16">
+          
+          {/* 3D Model with key for forced re-render */}
+          <div className="w-full lg:flex-1 lg:max-w-2xl order-1 lg:order-1">
+            <div className="w-full h-[50vh] lg:h-[70vh] min-h-[300px] lg:min-h-[500px]">
+              <LCViewer key={viewerKey} />
+            </div>
           </div>
-        </div>
 
-        <div className="flex-1 max-w-xl">
-          <div className="text-left">
-            <h1
-              className="text-6xl xl:text-7xl font-medium text-gray-900 mb-2 leading-tight"
-              style={{ fontFamily: 'RobotoRegular, sans-serif' }}
-            >
-              {nameText}
-            </h1>
+          {/* Text Content */}
+          <div className="w-full lg:flex-1 lg:max-w-xl order-2 lg:order-2">
+            <div className="text-center lg:text-left px-4 lg:px-0">
+              <h1
+                className="text-4xl sm:text-5xl md:text-6xl lg:text-6xl xl:text-7xl font-medium text-gray-900 mb-2 leading-tight"
+                style={{ fontFamily: 'RobotoRegular, sans-serif' }}
+              >
+                {nameText}
+              </h1>
 
-            <p
-              className="text-2xl xl:text-3xl text-black font-light tracking-wide mb-4"
-              style={{ fontFamily: 'RobotoRegular, sans-serif' }}
-            >
-              {subtitleText}
-            </p>
+              <p
+                className="text-xl sm:text-2xl lg:text-2xl xl:text-3xl text-black font-light tracking-wide mb-4"
+                style={{ fontFamily: 'RobotoRegular, sans-serif' }}
+              >
+                {subtitleText}
+              </p>
+            </div>
           </div>
-        </div>
-      </div>
-
-      {/* Mobile / Tablet */}
-      <div className="lg:hidden flex flex-col items-center justify-center w-full max-w-4xl">
-
-        <div className="w-full mb-8">
-          <div style={{ width: '100%', height: '50vh', minHeight: '300px' }}>
-            <LCViewer />
-          </div>
-        </div>
-
-        <div className="text-center px-4">
-          <h1
-            className="text-4xl sm:text-5xl md:text-6xl font-light text-gray-900 mb-2 leading-tight"
-            style={{ fontFamily: 'RobotoRegular, sans-serif' }}
-          >
-            {nameText}
-          </h1>
-
-          <p
-            className="text-xl sm:text-2xl text-black font-light tracking-wide mb-4"
-            style={{ fontFamily: 'RobotoRegular, sans-serif' }}
-          >
-            {subtitleText}
-          </p>
 
         </div>
       </div>
