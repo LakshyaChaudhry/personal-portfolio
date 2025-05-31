@@ -6,7 +6,7 @@ const aboutData = {
   name: "Lakshya Chaudhry",
   title: "AI @ Purdue",
   profileImage: headshot, 
-  description: "Hi My name is Lakshya Chaudhry, I'm studying Artificial Intelligence at Purdue University with a strong focus on leveraging AI and software for impactful, real-world applications. My interests span AI research, quant roles, and software engineering, where I’m committed to developing innovative solutions that make a difference.",
+  description: "Hi My name is Lakshya Chaudhry, I'm studying Artificial Intelligence at Purdue University with a strong focus on leveraging machine learning and software for impactful, real-world applications. My interests span AI research, quant roles, and software engineering, where I’m committed to developing innovative solutions that make a difference.",
   skills: ["React", "TypeScript", "Node.js", "Python", "Tailwind CSS", "AWS", "Azure"],
   social: {
     linkedin: "www.linkedin.com/in/lakshya-chaudhry-a0155a311",
