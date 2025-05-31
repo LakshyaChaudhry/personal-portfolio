@@ -20,7 +20,7 @@ function HomePage() {
       clearTimeout(resizeTimer);
       resizeTimer = setTimeout(() => {
         setViewerKey(prev => prev + 1);
-      }, 300); // Debounce resize
+      }, 300);
     };
 
     window.addEventListener('resize', handleResize);
