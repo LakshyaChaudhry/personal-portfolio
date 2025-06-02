@@ -90,8 +90,70 @@ function Blog() {
           </div>
         </div>
 
-        {/* Technologies Section */}
-        <div className="flex justify-center">
+      <div className="flex justify-center px-8 py-8">
+        <div className="bg-white/30 backdrop-blur-md rounded-2xl border border-white/40 px-8 py-6 shadow-lg">
+          {/* Header */}
+          <div className="text-center mb-6">
+            <h2 className="text-2xl font-light text-gray-900 mb-1">
+              Get In Touch
+            </h2>
+            <div className="w-12 h-0.5 bg-gradient-to-r from-blue-400 to-purple-500 mx-auto rounded-full"></div>
+          </div>
+
+          {/* Contact Form */}
+          <div className="space-y-6 mb-8">
+            {/* First Row - Name, Email, Phone */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+              <input
+                type="text"
+                placeholder="Name"
+                className="p-4 bg-white/20 backdrop-blur-sm rounded-xl border border-white/30 text-gray-700 placeholder-gray-500 focus:outline-none focus:border-blue-400 focus:bg-white/30 transition-all duration-300"
+              />
+              <input
+                type="email"
+                placeholder="Email Address"
+                className="p-4 bg-white/20 backdrop-blur-sm rounded-xl border border-white/30 text-gray-700 placeholder-gray-500 focus:outline-none focus:border-blue-400 focus:bg-white/30 transition-all duration-300"
+              />
+              <input
+                type="tel"
+                placeholder="Phone Number"
+                className="p-4 bg-white/20 backdrop-blur-sm rounded-xl border border-white/30 text-gray-700 placeholder-gray-500 focus:outline-none focus:border-blue-400 focus:bg-white/30 transition-all duration-300 sm:col-span-2 lg:col-span-1"
+              />
+            </div>
+
+            {/* Subject */}
+            <input
+              type="text"
+              placeholder="Enter Subject"
+              className="w-full p-4 bg-white/20 backdrop-blur-sm rounded-xl border border-white/30 text-gray-700 placeholder-gray-500 focus:outline-none focus:border-blue-400 focus:bg-white/30 transition-all duration-300"
+            />
+
+            {/* Message */}
+            <textarea
+              placeholder="Message"
+              rows={3}
+              className="w-full p-4 bg-white/20 backdrop-blur-sm rounded-xl border border-white/30 text-gray-700 placeholder-gray-500 focus:outline-none focus:border-blue-400 focus:bg-white/30 transition-all duration-300 resize-none"
+            />
+          </div>
+
+          {/* CTA Button */}
+          <div className="mt-6 pt-4 border-t border-white/30">
+            <button
+              onClick={() => {
+                // Handle form submission here
+                console.log('Form submitted');
+              }}
+              className="w-full block text-center py-3 px-6 bg-gradient-to-r from-pink-400 to-pink-600 text-white font-medium rounded-xl hover:from-pink-500 hover:to-pink-700 hover:scale-[1.02] transition-all duration-300 shadow-lg hover:shadow-xl"
+            >
+              Send Message
+            </button>
+          </div>
+        </div>
+    </div>
+  
+    
+    {/* Technologies Section */}
+    <div className="flex justify-center">
           <div className="bg-white/30 backdrop-blur-md rounded-2xl border border-white/40 px-8 py-6 shadow-lg">
             <h3 className="text-lg font-medium text-gray-800 mb-4 text-center">Technologies</h3>
             <div className="flex flex-wrap justify-center gap-3">
@@ -105,7 +167,7 @@ function Blog() {
               ))}
             </div>
           </div>
-        </div>
+        </div> 
       </div>
     </div>
   );
