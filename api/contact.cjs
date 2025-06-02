@@ -1,7 +1,6 @@
-import nodemailer from 'nodemailer';
-import type { VercelRequest, VercelResponse } from '@vercel/node';
+const nodemailer = require('nodemailer');
 
-export default async function handler(req: VercelRequest, res: VercelResponse) {
+module.exports = async function handler(req, res) {
   if (req.method !== 'POST') {
     return res.status(405).json({ message: 'Only POST requests allowed' });
   }
