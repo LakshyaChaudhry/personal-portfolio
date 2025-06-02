@@ -139,10 +139,36 @@ function Blog() {
           {/* CTA Button */}
           <div className="mt-6 pt-4 border-t border-white/30">
             <button
-              onClick={() => {
-                // Handle form submission here
-                console.log('Form submitted');
+              onClick={async () => {
+                const nameInput = document.querySelector('input[placeholder="Name"]') as HTMLInputElement;
+                const emailInput = document.querySelector('input[placeholder="Email Address"]') as HTMLInputElement;
+                const subjectInput = document.querySelector('input[placeholder="Enter Subject"]') as HTMLInputElement;
+                const messageInput = document.querySelector('textarea[placeholder="Message"]') as HTMLTextAreaElement;
+              
+                const payload = {
+                  name: nameInput.value,
+                  email: emailInput.value,
+                  subject: subjectInput.value,
+                  message: messageInput.value,
+                };
+              
+                const res = await fetch('/api/contact', {
+                  method: 'POST',
+                  headers: { 'Content-Type': 'application/json' },
+                  body: JSON.stringify(payload),
+                });
+              
+                if (res.ok) {
+                  alert('Thanks! Your message was sent.');
+                  nameInput.value = '';
+                  emailInput.value = '';
+                  subjectInput.value = '';
+                  messageInput.value = '';
+                } else {
+                  alert('Oops! Something went wrong.');
+                }
               }}
+              
               className="w-full block text-center py-3 px-6 bg-gradient-to-r from-pink-400 to-pink-600 text-white font-medium rounded-xl hover:from-pink-500 hover:to-pink-700 hover:scale-[1.02] transition-all duration-300 shadow-lg hover:shadow-xl"
             >
               Send Message
