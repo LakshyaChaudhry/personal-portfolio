@@ -2,7 +2,7 @@ import { Mail, Github, Twitter, Linkedin } from 'lucide-react';
 
 const aboutData = {
   name: "Lakshya Chaudhry",
-  title: "AI @ Purdue",
+  title: "",
   profileImage: '/assets/headshot.jpeg', 
   description: "Hi My name is Lakshya Chaudhry, I'm studying Artificial Intelligence at Purdue University with a strong focus on leveraging machine learning and software for impactful, real-world applications. My interests span AI research, quant roles, and software engineering, where I’m committed to developing innovative solutions that make a difference.",
   skills: ["React", "TypeScript", "Node.js", "Python", "Tailwind CSS", "AWS", "Azure"],
