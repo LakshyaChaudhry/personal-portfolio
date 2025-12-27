@@ -13,7 +13,7 @@ export default function Work() {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true, margin: "-50px" }}
             transition={{ duration: 0.5, delay: index * 0.1 }}
-            className="group relative flex flex-col h-full bg-neutral-50 dark:bg-neutral-900/20 border border-neutral-200 dark:border-white/5 p-8 hover:border-black dark:hover:border-white/20 transition-colors duration-500 rounded-sm"
+            className="group relative flex flex-col h-full bg-neutral-50 dark:bg-neutral-900/20 border border-neutral-200 dark:border-white/5 p-8 transition-all duration-500 rounded-sm hover:-translate-y-1 hover:shadow-lg dark:hover:shadow-white/5 ring-1 ring-transparent hover:ring-black dark:hover:ring-white"
         >
             <div className="flex justify-between items-start mb-6">
                 <span className="text-neutral-500 font-mono text-xs tracking-widest uppercase">
@@ -80,12 +80,10 @@ export default function Work() {
                                 {item.period}
                             </div>
                             <div className="md:col-span-9">
-                                <h3 className="text-2xl font-bold text-neutral-900 dark:text-white mb-2">{item.title}</h3>
+                                <h3 className="text-2xl font-bold text-neutral-900 dark:text-white mb-1">{item.title}</h3>
                                 <div className="text-neutral-500 dark:text-neutral-400 mb-4 font-medium">{item.role}</div>
-                                <p className="text-neutral-600 dark:text-neutral-400 font-light leading-relaxed max-w-2xl">
-                                    {item.fullDescription}
-                                </p>
-                                <div className="flex flex-wrap gap-2 mt-4">
+                                {/* Description removed per request */}
+                                <div className="flex flex-wrap gap-2 mt-2">
                                     {item.technologies.map(tech => (
                                         <span key={tech} className="text-xs font-mono text-neutral-500 border border-neutral-200 dark:border-white/10 px-2 py-1 rounded-full">{tech}</span>
                                     ))}

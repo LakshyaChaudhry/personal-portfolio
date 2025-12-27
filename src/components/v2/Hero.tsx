@@ -74,7 +74,7 @@ export default function Hero() {
                     Building elegant solutions to complex problems.
                 </p>
                 <p className="text-xl md:text-2xl font-light text-neutral-400">
-                    AI Safety Research <span className="text-neutral-600">@</span> Purdue.
+                    AI @ Purdue <span className="text-neutral-600">|</span> AI Safety Research
                 </p>
             </motion.div>
         </section>
