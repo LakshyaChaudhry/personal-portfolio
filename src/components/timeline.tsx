@@ -112,10 +112,11 @@ export default function Component() {
             <div className="relative flex flex-col items-center flex-shrink-0">
               {/* Logo Indicator */}
               <div
-                className={`flex items-center justify-center rounded-full border-2 bg-white shadow-lg transition-all duration-500 z-10 ${
+                className={`flex items-center justify-center rounded-full border-2 
+                          bg-white dark:bg-gray-800 shadow-lg transition-all duration-500 z-10 ${
                   item.current 
-                    ? 'w-12 h-12 border-orange-500 ring-4 ring-blue-100' 
-                    : 'w-10 h-10 border-gray-300'
+                    ? 'w-12 h-12 border-blue-500 ring-4 ring-blue-100 dark:ring-blue-900' 
+                    : 'w-10 h-10 border-gray-300 dark:border-gray-600'
                 }`}
               >
                 <img 
@@ -133,7 +134,7 @@ export default function Component() {
               {/* Connecting Line - Only show if not the last item */}
               {index < items.length - 1 && (
                 <div 
-                  className={`w-0.5 bg-gray-300 mt-4 transition-all duration-1000 ease-out ${
+                  className={`w-0.5 bg-gray-300 dark:bg-gray-700 mt-4 transition-all duration-1000 ease-out ${
                     visibleItems.has(item.id) ? 'h-20' : 'h-0'
                   }`}
                   style={{ 
@@ -146,37 +147,54 @@ export default function Component() {
             {/* Content */}
             <div className="flex-1 min-w-0 pt-1">
               {/* Date with Current Badge */}
-              <div className="flex flex-wrap items-center gap-2 mb-3 text-sm text-gray-500">
+              <div className="flex flex-wrap items-center gap-2 mb-3 text-sm 
+                            text-gray-500 dark:text-gray-400 transition-colors">
                 <Calendar size={14} />
                 <span className="font-medium">{item.date}</span>
                 {item.current && (
-                  <span className="px-3 py-1 bg-green-100 text-green-700 text-xs rounded-full font-medium border border-green-200">
+                  <span className="px-3 py-1 bg-green-100 dark:bg-green-900 
+                               text-green-700 dark:text-green-300 
+                               text-xs rounded-full font-medium 
+                               border border-green-200 dark:border-green-800 
+                               transition-colors">
                     Current
                   </span>
                 )}
               </div>
               
               {/* Job Title */}
-              <h3 className="text-xl md:text-2xl font-bold text-gray-900 mb-3 leading-tight">
+              <h3 className="text-xl md:text-2xl font-bold 
+                           text-gray-900 dark:text-white 
+                           mb-3 leading-tight transition-colors">
                 {item.title}
               </h3>
               
               {/* Company and Location Info */}
               <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-6 mb-4">
-                <div className="flex items-center gap-2 text-orange-600 font-semibold">
+                <div className="flex items-center gap-2 
+                              text-blue-600 dark:text-blue-400 
+                              font-semibold transition-colors">
                   <Building2 size={16} />
                   <span className="text-base">{item.company}</span>
                 </div>
                 
-                <div className="flex items-center gap-2 text-gray-500">
+                <div className="flex items-center gap-2 
+                              text-gray-500 dark:text-gray-400 
+                              transition-colors">
                   <MapPin size={14} />
                   <span className="text-sm">{item.location}</span>
                 </div>
               </div>
               
               {/* Description Card */}
-              <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-5 hover:shadow-md hover:border-gray-300 transition-all duration-300">
-                <p className="text-gray-700 leading-relaxed text-base">
+              <div className="bg-white dark:bg-gray-800 
+                            rounded-xl shadow-sm 
+                            border border-gray-200 dark:border-gray-700 
+                            p-5 hover:shadow-md 
+                            hover:border-gray-300 dark:hover:border-gray-600 
+                            transition-all duration-300">
+                <p className="text-gray-700 dark:text-gray-300 
+                            leading-relaxed text-base transition-colors">
                   {item.description}
                 </p>
               </div>

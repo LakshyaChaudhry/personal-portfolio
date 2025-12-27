@@ -3,43 +3,29 @@ import CodingProjects from "./components/CodingProjects";
 import Blog from "./components/Blog";
 import Navigation from "./components/Navigation";
 import Experience from "./components/Experience";
-import ScrollHint from "./components/ScrollHint"; // Add this component
 
 export default function App() {
   return (
-    <>
+    <div className="min-h-screen bg-white dark:bg-gray-950 transition-colors duration-300">
       <Navigation />
-
-      {/* horizontal carousel */}
-      <div
-        data-hide-scrollbar                /* hides WebKit track */
-        className="
-          flex overflow-x-auto
-          snap-x snap-mandatory
-          h-screen w-screen scroll-smooth
-          [scrollbar-width:none]           /* hides Firefox track */
-        "
-        style={{
-          WebkitOverflowScrolling: 'touch' /* iOS smooth scrolling */
-        }}
-      >
-        <section id="homepage" className="flex-none w-screen h-screen snap-start overflow-hidden">
+      
+      <main className="scroll-smooth">
+        <section id="homepage">
           <HomePage />
-          <ScrollHint />
         </section>
 
-        <section id="codingProjects" className="flex-none w-screen h-screen snap-start overflow-y-auto">
+        <section id="projects">
           <CodingProjects />
         </section>
 
-        <section id="experience" className="flex-none w-screen h-screen snap-start overflow-y-auto">
+        <section id="experience">
           <Experience />
         </section>
 
-        <section id="blog" className="flex-none w-screen h-screen snap-start overflow-y-auto">
+        <section id="about">
           <Blog />
         </section>
-      </div>
-    </>
+      </main>
+    </div>
   );
 }

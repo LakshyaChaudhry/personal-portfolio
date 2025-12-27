@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import LCViewer from './LCViewer';
+import { Github, Linkedin, Mail, FileText } from 'lucide-react';
 
 const TYPING_SPEED = 100;
 
@@ -10,25 +10,6 @@ function HomePage() {
   const [nameText, setNameText] = useState('');
   const [subtitleText, setSubtitleText] = useState('');
   const [hasTypedName, setHasTypedName] = useState(false);
-  const [hasTypedSubtitle, setHasTypedSubtitle] = useState(false);
-  const [viewerKey, setViewerKey] = useState(0);
-
-  // Force re-render of 3D viewer on significant resize
-  useEffect(() => {
-    let resizeTimer: ReturnType<typeof setTimeout>;
-    const handleResize = () => {
-      clearTimeout(resizeTimer);
-      resizeTimer = setTimeout(() => {
-        setViewerKey(prev => prev + 1);
-      }, 300);
-    };
-
-    window.addEventListener('resize', handleResize);
-    return () => {
-      window.removeEventListener('resize', handleResize);
-      clearTimeout(resizeTimer);
-    };
-  }, []);
 
   useEffect(() => {
     if (nameText.length < nameFull.length) {
@@ -47,46 +28,97 @@ function HomePage() {
         setSubtitleText(subtitleFull.slice(0, subtitleText.length + 1));
       }, TYPING_SPEED);
       return () => clearTimeout(timer);
-    } else if (
-      hasTypedName &&
-      subtitleText.length === subtitleFull.length &&
-      !hasTypedSubtitle
-    ) {
-      setHasTypedSubtitle(true);
     }
-  }, [hasTypedName, subtitleText, subtitleFull, hasTypedSubtitle]);
+  }, [hasTypedName, subtitleText, subtitleFull]);
 
   return (
-    <div className="flex-none w-screen min-h-screen scroll-snap-start flex flex-col justify-center items-center bg-gradient-to-br px-4 py-8">
-      <div className="w-full max-w-7xl">
-        <div className="flex flex-col lg:flex-row items-center justify-center gap-8 lg:gap-16">
-          
-          {/* 3D Model with key for forced re-render */}
-          <div className="w-full lg:flex-1 lg:max-w-2xl order-1 lg:order-1">
-            <div className="w-full h-[50vh] lg:h-[70vh] min-h-[300px] lg:min-h-[500px]">
-              <LCViewer key={viewerKey} />
-            </div>
+    <div className="min-h-screen flex items-center justify-center px-4 py-20 
+                    bg-white dark:bg-gray-950 transition-colors duration-300">
+      <div className="max-w-4xl w-full">
+        <div className="text-center space-y-6">
+          <h1 className="text-5xl sm:text-6xl md:text-7xl lg:text-8xl font-bold 
+                       text-gray-900 dark:text-white transition-colors duration-300">
+            {nameText}
+            <span className="animate-pulse">|</span>
+          </h1>
+
+          <p className="text-xl sm:text-2xl md:text-3xl text-gray-600 dark:text-gray-400 
+                      font-light transition-colors duration-300">
+            {subtitleText}
+          </p>
+
+          <p className="text-lg text-gray-600 dark:text-gray-400 max-w-2xl mx-auto 
+                      leading-relaxed mt-8 transition-colors duration-300">
+            Building AI solutions and crafting experiences at the intersection of 
+            machine learning and software engineering.
+          </p>
+
+          {/* Social Links */}
+          <div className="flex justify-center gap-4 mt-12">
+            <a 
+              href="https://github.com/LakshyaChaudhry" 
+              target="_blank" 
+              rel="noopener noreferrer"
+              className="p-3 rounded-full bg-gray-100 dark:bg-gray-800 
+                       hover:bg-gray-200 dark:hover:bg-gray-700 
+                       text-gray-700 dark:text-gray-300
+                       transition-all duration-200 hover:scale-110"
+              aria-label="GitHub"
+            >
+              <Github size={24} />
+            </a>
+            <a 
+              href="https://linkedin.com/in/lakshya-chaudhry" 
+              target="_blank" 
+              rel="noopener noreferrer"
+              className="p-3 rounded-full bg-gray-100 dark:bg-gray-800 
+                       hover:bg-gray-200 dark:hover:bg-gray-700 
+                       text-gray-700 dark:text-gray-300
+                       transition-all duration-200 hover:scale-110"
+              aria-label="LinkedIn"
+            >
+              <Linkedin size={24} />
+            </a>
+            <a 
+              href="mailto:lakshya@example.com"
+              className="p-3 rounded-full bg-gray-100 dark:bg-gray-800 
+                       hover:bg-gray-200 dark:hover:bg-gray-700 
+                       text-gray-700 dark:text-gray-300
+                       transition-all duration-200 hover:scale-110"
+              aria-label="Email"
+            >
+              <Mail size={24} />
+            </a>
+            <a 
+              href="/resume.pdf" 
+              target="_blank" 
+              rel="noopener noreferrer"
+              className="p-3 rounded-full bg-gray-100 dark:bg-gray-800 
+                       hover:bg-gray-200 dark:hover:bg-gray-700 
+                       text-gray-700 dark:text-gray-300
+                       transition-all duration-200 hover:scale-110"
+              aria-label="Resume"
+            >
+              <FileText size={24} />
+            </a>
           </div>
 
-          {/* Text Content */}
-          <div className="w-full lg:flex-1 lg:max-w-xl order-2 lg:order-2">
-            <div className="text-center lg:text-left px-4 lg:px-0">
-              <h1
-                className="text-4xl sm:text-5xl md:text-6xl lg:text-6xl xl:text-7xl font-medium text-gray-900 mb-2 leading-tight"
-                style={{ fontFamily: 'RobotoRegular, sans-serif' }}
+          {/* Scroll Indicator */}
+          <div className="mt-16">
+            <a href="#projects" className="inline-block animate-bounce">
+              <svg 
+                className="w-6 h-6 text-gray-400 dark:text-gray-600" 
+                fill="none" 
+                strokeLinecap="round" 
+                strokeLinejoin="round" 
+                strokeWidth="2" 
+                viewBox="0 0 24 24" 
+                stroke="currentColor"
               >
-                {nameText}
-              </h1>
-
-              <p
-                className="text-xl sm:text-2xl lg:text-2xl xl:text-3xl text-black font-light tracking-wide mb-4"
-                style={{ fontFamily: 'RobotoRegular, sans-serif' }}
-              >
-                {subtitleText}
-              </p>
-            </div>
+                <path d="M19 14l-7 7m0 0l-7-7m7 7V3"></path>
+              </svg>
+            </a>
           </div>
-
         </div>
       </div>
     </div>

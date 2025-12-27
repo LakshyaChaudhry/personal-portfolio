@@ -1,55 +1,153 @@
-# React + TypeScript + Vite
+# Personal Portfolio V2
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+A modern, responsive portfolio website built with React, TypeScript, and Tailwind CSS. Features a clean design with light/dark mode support.
 
-Currently, two official plugins are available:
+## ✨ Features
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+- 🌓 **Dark/Light Mode**: Seamless theme switching with persistent preferences
+- 📱 **Fully Responsive**: Optimized for all screen sizes
+- ⚡ **Fast Performance**: Built with Vite for lightning-fast development and builds
+- 🎨 **Modern Design**: Clean, minimalist interface inspired by contemporary web design
+- 🎭 **Smooth Animations**: Powered by Framer Motion
+- 📧 **Contact Form**: Integrated contact functionality
+- 🎯 **SEO Optimized**: Proper meta tags and semantic HTML
 
-## Expanding the ESLint configuration
+## 🛠️ Tech Stack
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+- **Framework**: React 19
+- **Language**: TypeScript
+- **Styling**: Tailwind CSS v4
+- **Animations**: Framer Motion
+- **Build Tool**: Vite
+- **Icons**: Lucide React
+- **Deployment**: Vercel
 
-```js
-export default tseslint.config({
-  extends: [
-    // Remove ...tseslint.configs.recommended and replace with this
-    ...tseslint.configs.recommendedTypeChecked,
-    // Alternatively, use this for stricter rules
-    ...tseslint.configs.strictTypeChecked,
-    // Optionally, add this for stylistic rules
-    ...tseslint.configs.stylisticTypeChecked,
-  ],
-  languageOptions: {
-    // other options...
-    parserOptions: {
-      project: ['./tsconfig.node.json', './tsconfig.app.json'],
-      tsconfigRootDir: import.meta.dirname,
-    },
-  },
-})
+## 📂 Project Structure
+
+```
+personal-portfolio/
+├── src/
+│   ├── components/       # React components
+│   │   ├── HomePage.tsx
+│   │   ├── Navigation.tsx
+│   │   ├── CodingProjects.tsx
+│   │   ├── ProjectCard.tsx
+│   │   ├── Experience.tsx
+│   │   ├── timeline.tsx
+│   │   └── Blog.tsx
+│   ├── contexts/         # React contexts
+│   │   └── ThemeContext.tsx
+│   ├── data/            # Static data
+│   │   └── projects.ts
+│   ├── lib/             # Utilities
+│   │   └── utils.ts
+│   ├── App.tsx          # Main app component
+│   ├── main.tsx         # Entry point
+│   └── index.css        # Global styles
+├── public/              # Static assets
+└── api/                 # API routes
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+## 🚀 Getting Started
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+### Prerequisites
 
-export default tseslint.config({
-  plugins: {
-    // Add the react-x and react-dom plugins
-    'react-x': reactX,
-    'react-dom': reactDom,
-  },
-  rules: {
-    // other rules...
-    // Enable its recommended typescript rules
-    ...reactX.configs['recommended-typescript'].rules,
-    ...reactDom.configs.recommended.rules,
-  },
-})
+- Node.js 18+ 
+- npm or pnpm
+
+### Installation
+
+1. Clone the repository:
+```bash
+git clone https://github.com/LakshyaChaudhry/personal-portfolio.git
+cd personal-portfolio
 ```
-# personal-portfolio
+
+2. Install dependencies:
+```bash
+npm install
+```
+
+3. Start the development server:
+```bash
+npm run dev
+```
+
+4. Open [http://localhost:5173](http://localhost:5173) in your browser
+
+### Building for Production
+
+```bash
+npm run build
+```
+
+### Preview Production Build
+
+```bash
+npm run preview
+```
+
+## 🎨 Customization
+
+### Updating Projects
+
+Edit `src/data/projects.ts` to add or modify projects:
+
+```typescript
+export const projects: Project[] = [
+  {
+    id: '1',
+    title: "Your Project",
+    shortDescription: "Brief description",
+    fullDescription: "Detailed description",
+    technologies: ["React", "TypeScript"],
+    githubLink: "https://github.com/...",
+    liveLink: "https://...",
+  },
+];
+```
+
+### Updating Experience
+
+Edit `src/components/timeline.tsx` to modify the experience timeline.
+
+### Changing Theme Colors
+
+Modify the color scheme in `src/index.css` under the `:root` and `.dark` selectors.
+
+## 📝 Sections
+
+1. **Home**: Introduction with social links
+2. **Projects**: Showcase of coding projects with detailed modals
+3. **Experience**: Professional timeline with company logos
+4. **About**: Personal information and contact form
+
+## 🌐 Deployment
+
+This project is configured for easy deployment on Vercel:
+
+1. Push your code to GitHub
+2. Import the project in Vercel
+3. Deploy with default settings
+
+## 📄 License
+
+This project is open source and available under the [MIT License](LICENSE).
+
+## 👤 Author
+
+**Lakshya Chaudhry**
+
+- GitHub: [@LakshyaChaudhry](https://github.com/LakshyaChaudhry)
+- LinkedIn: [Lakshya Chaudhry](https://www.linkedin.com/in/lakshya-chaudhry-a0155a311)
+- Email: lakshchaudhry@gmail.com
+
+## 🙏 Acknowledgments
+
+- Design inspiration from [krishgarg.ca](https://www.krishgarg.ca)
+- Icons by [Lucide](https://lucide.dev)
+- Animations by [Framer Motion](https://www.framer.com/motion)
+
+---
+
+⭐ Star this repo if you find it helpful!
