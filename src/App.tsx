@@ -1,31 +1,16 @@
-import HomePage from "./components/HomePage";
-import CodingProjects from "./components/CodingProjects";
-import Blog from "./components/Blog";
-import Navigation from "./components/Navigation";
-import Experience from "./components/Experience";
+import Layout from "./components/Layout";
+import Hero from "./components/v2/Hero";
+import Work from "./components/v2/Work";
+import About from "./components/v2/About";
 
 export default function App() {
   return (
-    <div className="min-h-screen bg-white dark:bg-gray-950 transition-colors duration-300">
-      <Navigation />
-      
-      <main className="scroll-smooth">
-        <section id="homepage">
-          <HomePage />
-        </section>
-
-        <section id="projects">
-          <CodingProjects />
-        </section>
-
-        <section id="experience">
-          <Experience />
-        </section>
-
-        <section id="about">
-          <Blog />
-        </section>
-      </main>
-    </div>
+    <Layout>
+      <Hero />
+      <Work />
+      <div id="about">
+        <About />
+      </div>
+    </Layout>
   );
 }
