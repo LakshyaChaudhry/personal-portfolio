@@ -42,9 +42,9 @@ export default function About() {
                 >
                     <div className="flex flex-wrap justify-center gap-x-8 gap-y-4 text-sm font-bold tracking-widest text-neutral-900 dark:text-white uppercase font-mono">
                         <motion.a variants={linkVariant} whileHover="hover" href="https://github.com/LakshyaChaudhry" target="_blank" rel="noopener noreferrer" className="border-b-2 border-transparent hover:border-black dark:hover:border-white transition-colors">GitHub</motion.a>
-                        <motion.a variants={linkVariant} whileHover="hover" href="https://linkedin.com/in/lakshyachaudhry" target="_blank" rel="noopener noreferrer" className="border-b-2 border-transparent hover:border-black dark:hover:border-white transition-colors">LinkedIn</motion.a>
-                        <motion.a variants={linkVariant} whileHover="hover" href="#" className="border-b-2 border-transparent hover:border-black dark:hover:border-white transition-colors">Twitter</motion.a>
-                        <motion.a variants={linkVariant} whileHover="hover" href="mailto:hello@example.com" className="border-b-2 border-transparent hover:border-black dark:hover:border-white transition-colors">Email</motion.a>
+                        <motion.a variants={linkVariant} whileHover="hover" href="https://www.linkedin.com/in/lakshya-chaudhry-a0155a311" target="_blank" rel="noopener noreferrer" className="border-b-2 border-transparent hover:border-black dark:hover:border-white transition-colors">LinkedIn</motion.a>
+                        <motion.a variants={linkVariant} whileHover="hover" href="https://x.com/LakshChaudhry" target="_blank" rel="noopener noreferrer" className="border-b-2 border-transparent hover:border-black dark:hover:border-white transition-colors">X</motion.a>
+                        <motion.a variants={linkVariant} whileHover="hover" href="mailto:lakshchaudhry@gmail.com" className="border-b-2 border-transparent hover:border-black dark:hover:border-white transition-colors">Email</motion.a>
                     </div>
                 </motion.div>
             </div>
