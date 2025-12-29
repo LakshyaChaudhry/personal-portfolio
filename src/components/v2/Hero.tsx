@@ -1,4 +1,5 @@
 import { motion } from 'framer-motion';
+import MagneticLetter from './MagneticLetter';
 
 const letterAnimation = {
     hidden: { opacity: 0, y: 50 },
@@ -25,8 +26,8 @@ export default function Hero() {
     const lastName = "CHAUDHRY".split("");
 
     return (
-        <section className="min-h-[85vh] flex flex-col justify-center">
-            <div className="flex flex-col gap-2 md:gap-4 select-none">
+        <section className="min-h-[85vh] flex flex-col justify-center relative overflow-hidden">
+            <div className="flex flex-col gap-2 md:gap-4 select-none relative z-10">
                 {/* First Name */}
                 <motion.div
                     variants={sentenceAnimation}
@@ -35,13 +36,13 @@ export default function Hero() {
                     className="flex overflow-hidden"
                 >
                     {firstName.map((char, index) => (
-                        <motion.h1
-                            key={index}
-                            variants={letterAnimation}
-                            className="text-[12vw] leading-[0.85] font-bold tracking-tighter"
-                        >
-                            {char}
-                        </motion.h1>
+                        <motion.div key={index} variants={letterAnimation}>
+                            <MagneticLetter
+                                className="text-[12vw] leading-[0.85] font-bold tracking-tighter text-black dark:text-white"
+                            >
+                                {char}
+                            </MagneticLetter>
+                        </motion.div>
                     ))}
                 </motion.div>
 
@@ -53,13 +54,13 @@ export default function Hero() {
                     className="flex overflow-hidden"
                 >
                     {lastName.map((char, index) => (
-                        <motion.h1
-                            key={index}
-                            variants={letterAnimation}
-                            className="text-[12vw] leading-[0.85] font-bold tracking-tighter text-neutral-500"
-                        >
-                            {char}
-                        </motion.h1>
+                        <motion.div key={index} variants={letterAnimation}>
+                            <MagneticLetter
+                                className="text-[12vw] leading-[0.85] font-bold tracking-tighter text-neutral-500"
+                            >
+                                {char}
+                            </MagneticLetter>
+                        </motion.div>
                     ))}
                 </motion.div>
             </div>
