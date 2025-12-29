@@ -95,7 +95,7 @@ export default function Work() {
             </div>
 
             {/* Projects */}
-            <div className="mb-32">
+            <div id="projects" className="mb-32">
                 <div className="flex items-end justify-between mb-16 px-4 md:px-0">
                     <h2 className="text-[8vw] leading-[0.8] font-bold tracking-tighter text-neutral-200 dark:text-neutral-800 select-none">
                         PROJECTS

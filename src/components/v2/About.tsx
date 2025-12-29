@@ -7,33 +7,29 @@ export default function About() {
 
     return (
         <section className="py-32">
-            <div className="max-w-4xl mx-auto text-center px-6">
-                <motion.h2
-                    initial={{ opacity: 0, y: 20 }}
-                    whileInView={{ opacity: 1, y: 0 }}
-                    viewport={{ once: true }}
-                    transition={{ duration: 0.6 }}
-                    className="text-sm font-mono text-neutral-500 tracking-widest uppercase mb-16"
-                >
-                    About Me
-                </motion.h2>
+            {/* Left aligned header container matching WORK styling */}
+            <div className="max-w-4xl mx-auto px-6 mb-16">
+                <div className="flex items-end justify-center">
+                    <h2 className="text-[10vw] leading-[0.8] font-bold tracking-tighter text-neutral-200 dark:text-neutral-800 select-none">
+                        ABOUT
+                    </h2>
+                </div>
+            </div>
 
+            <div className="max-w-4xl mx-auto px-6 text-center">
                 <motion.div
                     initial={{ opacity: 0, y: 20 }}
                     whileInView={{ opacity: 1, y: 0 }}
                     viewport={{ once: true }}
                     transition={{ duration: 0.6, delay: 0.2 }}
-                    className="space-y-12 text-2xl md:text-4xl font-light text-neutral-800 dark:text-neutral-200 leading-relaxed"
+                    className="space-y-8 text-xl md:text-3xl font-light text-neutral-800 dark:text-neutral-200 leading-relaxed"
                 >
                     <p>
-                        I am a full-stack developer and researcher focused on <span className="font-normal text-black dark:text-white">AI Alignment</span> and <span className="font-normal text-black dark:text-white">Engineering Agents</span>.
-                    </p>
-                    <p className="text-xl md:text-2xl text-neutral-600 dark:text-neutral-400">
-                        My work revolves around building robust, scalable systems that bridge the gap between advanced machine learning research and practical, safe applications.
+                        I am a student learning about <span className="font-normal text-black dark:text-white">AI Alignment</span>, <span className="font-normal text-black dark:text-white">Engineering Agents</span>, and building robust systems that can tackle the complexities of the real world from first principles.
                     </p>
 
-                    <p className="text-xl md:text-2xl text-neutral-600 dark:text-neutral-400 italic font-serif">
-                        "When I'm away from the screen, I'm travelling, being a top 0.01% Drake listener, working on my golf swing, shooting hoops, and seeking new fit inspos."
+                    <p className="text-neutral-600 dark:text-neutral-400">
+                        Outside of research, I've competed as an <span className="text-neutral-800 dark:text-neutral-200 font-normal">NSDA National Champion</span> in extemporaenous speaking, and like to travel (107,220 miles flown in 2025). I'm also a top 0.01% Drake listener, currently working on my golf swing, shooting hoops, and always looking for new fit inspos.
                     </p>
                 </motion.div>
 
@@ -45,8 +41,8 @@ export default function About() {
                     className="mt-24"
                 >
                     <div className="flex flex-wrap justify-center gap-x-8 gap-y-4 text-sm font-bold tracking-widest text-neutral-900 dark:text-white uppercase font-mono">
-                        <motion.a variants={linkVariant} whileHover="hover" href="#" className="border-b-2 border-transparent hover:border-black dark:hover:border-white transition-colors">GitHub</motion.a>
-                        <motion.a variants={linkVariant} whileHover="hover" href="#" className="border-b-2 border-transparent hover:border-black dark:hover:border-white transition-colors">LinkedIn</motion.a>
+                        <motion.a variants={linkVariant} whileHover="hover" href="https://github.com/LakshyaChaudhry" target="_blank" rel="noopener noreferrer" className="border-b-2 border-transparent hover:border-black dark:hover:border-white transition-colors">GitHub</motion.a>
+                        <motion.a variants={linkVariant} whileHover="hover" href="https://linkedin.com/in/lakshyachaudhry" target="_blank" rel="noopener noreferrer" className="border-b-2 border-transparent hover:border-black dark:hover:border-white transition-colors">LinkedIn</motion.a>
                         <motion.a variants={linkVariant} whileHover="hover" href="#" className="border-b-2 border-transparent hover:border-black dark:hover:border-white transition-colors">Twitter</motion.a>
                         <motion.a variants={linkVariant} whileHover="hover" href="mailto:hello@example.com" className="border-b-2 border-transparent hover:border-black dark:hover:border-white transition-colors">Email</motion.a>
                     </div>

@@ -38,8 +38,8 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
                 <div className="flex items-center gap-8">
                     <nav className="hidden md:flex gap-8 text-sm font-medium tracking-wide">
                         <a href="#work" className="hover:opacity-50 transition-opacity">WORK</a>
+                        <a href="#projects" className="hover:opacity-50 transition-opacity">PROJECTS</a>
                         <a href="#about" className="hover:opacity-50 transition-opacity">ABOUT</a>
-                        <a href="#contact" className="hover:opacity-50 transition-opacity">CONNECT</a>
                     </nav>
                     <button
                         onClick={toggleTheme}
