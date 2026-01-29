@@ -1,16 +1,17 @@
+import { Routes, Route } from "react-router-dom";
 import Layout from "./components/Layout";
-import Hero from "./components/v2/Hero";
-import Work from "./components/v2/Work";
-import About from "./components/v2/About";
+import HomePage from "./pages/HomePage";
+import BlogIndex from "./components/blog/BlogIndex";
+import BlogPost from "./components/blog/BlogPost";
 
 export default function App() {
   return (
     <Layout>
-      <Hero />
-      <Work />
-      <div id="about">
-        <About />
-      </div>
+      <Routes>
+        <Route path="/" element={<HomePage />} />
+        <Route path="/blog" element={<BlogIndex />} />
+        <Route path="/blog/:slug" element={<BlogPost />} />
+      </Routes>
     </Layout>
   );
 }
