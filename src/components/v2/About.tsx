@@ -25,11 +25,11 @@ export default function About() {
                     className="space-y-8 text-xl md:text-3xl font-light text-neutral-800 dark:text-neutral-200 leading-relaxed"
                 >
                     <p>
-                        I am a student learning about <span className="font-normal text-black dark:text-white">AI Alignment</span>, <span className="font-normal text-black dark:text-white">Engineering Agents</span>, and building robust systems that can tackle the complexities of the real world from first principles.
+                        I am a student learning about <span className="font-normal text-black dark:text-white">AI Alignment</span>, <span className="font-normal text-black dark:text-white">Applied AI</span>, and building robust systems that can tackle the complexities of the real world from first principles.
                     </p>
 
                     <p className="text-neutral-600 dark:text-neutral-400">
-                        Outside of research, I've competed as an <span className="text-neutral-800 dark:text-neutral-200 font-normal">NSDA National Champion</span> in extemporaenous speaking, and like to travel (107,220 miles flown in 2025). I'm also a top 0.01% Drake listener, currently working on my golf swing, shooting hoops, and always looking for new fit inspos.
+                        Outside of research, I've competed as an <span className="text-neutral-800 dark:text-neutral-200 font-normal">NSDA National Champion</span> in extemporaenous speaking, and like to travel (107,220 miles flown in 2025). I'm also an avid music listener (116,267 minutes listened in 2025), currently working on my golf swing, shooting hoops, and enjoy 'zero effort photography' with my fujifilm.
                     </p>
                 </motion.div>
 
