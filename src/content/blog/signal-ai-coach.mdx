@@ -1,0 +1,194 @@
+---
+title: "I Fine-Tuned a Productivity Coach on My Own Habits"
+date: "2026-01-30"
+description: "How post-it notes, 1,442 training examples, and an M3 Ultra led to a model that actually knows when I slack off, and can tell me how to improve."
+tags: ["ai", "fine-tuning", "productivity"]
+published: true
+---
+
+![Signal demo](/assets/blog/signal_demo.gif)
+
+Last semester, in a search of improving my habits, I tracked every waking hour on post-it notes. Wake time. Study sessions. How long I doom-scrolled Instagram. The brutal, handwritten truth of where my time actually went.
+
+It worked. I went from 3+ hours of daily social media to something manageable (~1.5 hrs). But I wanted more than self-awareness, I wanted a coach that understood *my* patterns, not generic productivity advice from an app that doesn't know I can't focus after 10pm or match me to psychological theories that just don't speak to me.
+
+So I built one. Signal is a brutalist productivity tracker (I built the fullstack) with a locally fine-tuned AI coach, trained on a combination of productivity literature that I've read and my own behavioral data. The whole thing was trained, hosted, and runs on my M3 Ultra Mac Studio. No cloud API calls, no data leaving my machine. I shipped it in < 3 days.
+
+Here's what I learned.
+
+---
+
+## The Problem with Generic Advice
+
+Every productivity app told me the same things. *Block distractions. Schedule deep work. Take breaks, Pomodoro method, etc.*
+
+The problem isn't that this advice is wrong, it's that it's not *calibrated*. When ChatGPT tells me to schedule my most demanding work for the morning, it doesn't know that my 9am sessions average 82 minutes of focus while my 3pm sessions crater to 45 minutes. It can't see that I consistently overestimate how long I'll study on Sundays, or that my "quick break" almost always balloons past 30 minutes of doomscrolling on Tiktok.
+
+I wanted a coach that had actually seen my data. Not one that inferred my patterns from a prompt, one that had *learned* them during training and tell me how I could truly improve.
+
+## The Data Story
+
+I learnt that building a fine-tuning dataset is mostly data synthesis and wrangling. I had two sources:
+
+**1. Productivity Literature (Domain Knowledge)**
+
+I extracted text from two books that I've read and love: Cal Newport's *Deep Work* and James Clear's *Atomic Habits* using PyMuPDF—roughly 70K words per book (its not illegal if im not commercially distributing the model, don't worry). Then I chunked them into ~500-word segments with overlap: 160 chunks from *Deep Work*, 172 from *Atomic Habits*.
+
+For each chunk, I called Claude's API to generate 3-5 instruction-response pairs. The prompt was simple: given this passage, generate questions a student might ask and answers grounded in the text. This gave me 1,420 synthetic training examples covering focus strategies, habit formation, environment design, and the psychology of attention.
+
+**2. Personal Logs (Behavioral Calibration)**
+
+This was the critical piece. I exported 70 days of my Signal logs from when I logged each day on the fullstack app I built—timestamped activities with **5 quality ratings** (Deep Work, Focused, Neutral, Distracted, Wasted). From these, I generated 22 personalized Q&A pairs.
+
+The key insight I learnt from some chatting with Claude: these 22 examples (1.5% of the dataset) weren't meant, and didn't need to dominate training. They were *templates*, teaching the model the pattern of "here's user data, here's how to reference it in coaching advice."
+
+For example:
+
+```
+Q: I tracked 345 minutes of signal time today but felt unproductive. What's going on?
+
+A: Looking at your logs, your morning session (9:12am-10:34am, 82 minutes) was
+rated Deep Work, but your afternoon sessions after 3pm averaged only Focused
+or Neutral quality despite longer durations. High signal time with low
+perceived productivity often means you're logging hours without cognitive
+intensity. Consider front-loading your hardest tasks before 3pm when your
+focus quality is measurably higher.
+```
+
+The intention was that the model learns that coaching responses should reference specific times, durations, and quality ratings from the my own data's context, not just give abstract advice.
+
+**Final Dataset: 1,442 pairs**, converted to Llama 3.1's chat template and saved as JSONL.
+
+---
+
+## Fine-Tuning on Apple Silicon
+
+I chose Llama 3.1 8B as the base model so that small enough to iterate quickly, large enough to retain coherent multi-turn reasoning. The 96GB unified memory on my Mac Studio meant I could comfortably fit the model in memory with headroom for gradient computation.
+
+**The stack:**
+- **MLX** for training (Apple's framework optimized for ML)
+- **LoRA** to keep trainable parameters manageable
+- **LM Studio** for serving the final model locally
+
+### Training Details
+
+LoRA lets you freeze most of the model and only train small adapter matrices. My setup trained 10.5M parameters out of 8B total—just 0.13% of the model.
+
+```
+Trainable parameters: 0.131% (10.486M/8030.261M)
+```
+
+Hyperparameters I used:
+
+```
+Set hyperparameters:
+
+- Batch size: 4
+- LoRA layers: 16
+- Iterations: 600-800
+- Learning rate: 1e-5
+- Validation batches: 25
+```
+
+I ran 700 iterations at a learning rate of 1e-5. The loss curve was satisfying:
+
+| Iteration | Train Loss | Val Loss |
+|-----------|------------|----------|
+| 1         | —          | 3.241    |
+| 100       | 0.816      | —        |
+| 200       | 0.812      | 0.815    |
+| 400       | 0.711      | 0.764    |
+| 600       | 0.706      | 0.769    |
+| 700       | 0.585      | 0.779    |
+
+The validation loss plateaued around 0.76-0.78 while training loss kept dropping, which I came to learn, was a sign the model was starting to memorize rather than generalize. I stopped at 700 iterations. In retrospect, I probably could have stopped at 400-500 and gotten similar results with less overfitting risk.
+
+**Resource usage:** ~25GB peak memory, ~620 tokens/second throughput. Training took roughly  ~45 minutes total
+
+### Converting to Production
+
+After training, I merged the LoRA adapters into the base model using MLX's `fuse` command, then converted to GGUF format for LM Studio. The whole inference stack runs locally:
+
+1. Signal app (Next.js) sends user's daily logs + query to local endpoint
+2. LM Studio serves the fine-tuned model with OpenAI-compatible API
+3. Model responds with context-aware coaching
+
+No rate limits, no API costs, no latency from round-trips to a data center.
+
+---
+
+## Making It Actually Useful
+
+A fine-tuned model is useless if the interface doesn't surface the right context. Three things made Signal's coach actually helpful:
+
+**1. Day-Aware Context Injection**
+
+Every coaching query includes my logs for the current day, formatted as structured data. The system prompt explicitly instructs the model to reference this data when relevant:
+
+```
+You are a productivity coach. When the user asks for advice, reference their
+activity data to give personalized recommendations. Cite specific times,
+durations, and quality ratings from their logs.
+```
+
+This is simple prompt engineering, but it matters. Without this instruction, the fine-tuned model still tends toward generic advice as I found the personal examples in training aren't enough to override the base model's default behavior.
+
+**2. Streaming Responses**
+
+LM Studio's API supports streaming, so the coach's responses appear token-by-token. This feels more conversational and hides the latency of local inference (Llama 8B at Q16 quantization generates about 45 tokens/second on my setup).
+
+**3. Brutalist UI**
+
+Signal's interface is aggressively minimal: black background, IBM Plex Mono, no gamification. This matches the philosophy of the tracking system: raw honesty over feel-good metrics. The coach sits in a slide-out panel, available but not intrusive.
+
+---
+
+## What Surprised Me
+
+**The personal examples punched above their weight.** 22 examples out of 1,442 (1.5%) had an outsized effect on response style. The model reliably references user data when it's present in context, even though it only saw a handful of examples of this behavior during training. This suggests that fine-tuning's value isn't just adding knowledge, it's teaching *patterns* of response that the base model then applies more broadly.
+
+**Validation loss vs. actual quality.** The loss curves suggested I was really trending toward overfitting after iteration 400-500. But qualitative evaluation told a different story. The responses at iteration 700 felt more natural and confident than earlier checkpoints. I don't have a great explanation for this. It's possible the validation set wasn't representative, or that the loss metric doesn't capture what I actually care about (helpfulness, specificity, tone). But I suspect it was the former.
+
+**Local inference is good enough.** I expected to miss cloud models' speed, especially having hosted it on a Mac Studio. But ~45 tokens/second is plenty fast for a coaching context where you're only sending a few queries per day. The latency was not really noticeable to me.
+
+---
+
+## What I'd Do Differently
+
+**More diverse personal examples.** 22 examples was enough to teach the pattern, but I suspect 50-100 would make the personalization more robust. I'd also include more edge cases: days with zero productivity, days that were surprisingly good, weekends. Plus I found the model didn't respond in depth as much to sleep related queries, suggesting we could add more samples in the training data related to that.
+
+**Proper evaluation frameworks.** I manually review quality by reading responses to test prompts. This is fine for a personal project, but it doesn't scale. Next time I'd set up a rubric and maybe get a few friends to blind-rate responses from the fine-tuned model vs. base model vs. ChatGPT. But again "personal ai" would result in subjective evaluations.
+
+**Learning rate scheduling.** I used a constant learning rate, which works but isn't optimal. A warmup period and cosine decay would probably help convergence and reduce overfitting.
+
+---
+
+## Open Questions
+
+Some things I'm still thinking about:
+
+**How do you evaluate a personal coach?** Standard benchmarks don't apply. I can't measure helpfulness in aggregate when n=1 (me). I'm considering logging my actual behavior after receiving coaching advice and measuring whether the advice correlates with better outcomes, but that's a long feedback loop.
+
+**DPO for personalization.** The plan is to add thumbs-up/thumbs-down buttons to coaching responses and use Direct Preference Optimization to tune the model based on my feedback. The question is whether I'll generate enough preference pairs to meaningfully move the model—DPO typically wants hundreds or thousands of comparisons.
+
+**Dynamic day boundaries.** Signal defines "days" from wake time to sleep time (modeled after Whoop), not midnight to midnight. This matters for college schedules where you might study until 2am. But it creates interesting edge cases for the coach so if I ask "how did today go?" at 1am, which day am I asking about? The current implementation is hacky.
+
+---
+
+## The Actual Product
+
+Signal was about two things for me: a brutalist productivity tracker (the fullstack) and a fine-tuned AI coach. The tracker is the foundation: without honest data, the coach has nothing to work with, and I'd have no data to 'personally' fine tune llama on. The coach is the leverage as it turns passive logging into active optimization.
+
+The tracker itself is a full Next.js app with Prisma and PostgreSQL hosted locally on Docker with timeline visualization, live timer with picture-in-picture, dynamic day boundaries based on sleep. But that's a post for another time. (built in < 3 days as well)
+
+I built this to solve my own problem, but I think the pattern generalizes. Fine-tuning on small amounts of personal data, combined with rich context injection at inference time, can create AI assistants that feel genuinely personalized and not just "I'll remember you mentioned your name is Laksh" personalized, but "I've learned your focus deteriorates after 3pm" personalized, while providing psychological strategies that relate to you.
+
+The whole thing was built, trained, and ran on my mac. No cloud, no monthly API bill, no data leaving the machine.
+
+---
+
+*-Lakshya Chaudhry*
+
+---
+
+*I'd pause working on Signal for the moment as the functionality serves me well for the time being. If you're interested in local AI personalization, I'd love to hear what you're working on—reach out on [Twitter/X](https://x.com/lakshyachaudhry) or [email](mailto:lakshyachaudhry@gmail.com).*

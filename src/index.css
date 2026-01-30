@@ -249,6 +249,22 @@
   @apply rounded-sm my-8;
 }
 
+.prose-blog table {
+  @apply w-full mb-6 text-sm border-collapse;
+}
+
+.prose-blog thead {
+  @apply border-b-2 border-neutral-300 dark:border-white/20;
+}
+
+.prose-blog th {
+  @apply text-left font-semibold py-2 px-3 text-neutral-900 dark:text-white;
+}
+
+.prose-blog td {
+  @apply py-2 px-3 border-b border-neutral-200 dark:border-white/10 font-light;
+}
+
 @layer base {
   html {
     scroll-behavior: smooth;
