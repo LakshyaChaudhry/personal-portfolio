@@ -1,11 +1,11 @@
 import { motion } from 'framer-motion';
+import { Link } from 'react-router-dom';
 import { projects } from '../../data/projects';
 import { Github, ArrowUpRight, FileText } from 'lucide-react';
 
 export default function Work() {
     const experience = projects.filter(p => p.category === 'experience');
-    const projectItems = projects.filter(p => p.category === 'project');
-    const publications = projects.filter(p => p.category === 'publication');
+    const projectItems = projects.filter(p => (p.category === 'project' || p.category === 'research') && !p.hidden);
 
     const Card = ({ item, index }: { item: typeof projects[0], index: number }) => (
         <motion.div
@@ -16,9 +16,16 @@ export default function Work() {
             className="group relative flex flex-col h-full bg-neutral-50 dark:bg-neutral-900/20 border border-neutral-200 dark:border-white/5 p-8 transition-all duration-500 rounded-sm hover:-translate-y-1 hover:shadow-lg dark:hover:shadow-white/5 ring-1 ring-transparent hover:ring-black dark:hover:ring-white"
         >
             <div className="flex justify-between items-start mb-6">
-                <span className="text-neutral-500 font-mono text-xs tracking-widest uppercase">
-                    {item.category}
-                </span>
+                <div className="flex items-center gap-2">
+                    <span className="text-neutral-500 font-mono text-xs tracking-widest uppercase">
+                        {item.category}
+                    </span>
+                    {item.status && (
+                        <span className="text-[10px] font-mono tracking-wider text-neutral-400 border border-neutral-300 dark:border-white/20 px-2 py-0.5 rounded-full">
+                            {item.status}
+                        </span>
+                    )}
+                </div>
                 <div className="flex gap-3">
                     {item.githubLink && (
                         <a href={item.githubLink} target="_blank" rel="noopener noreferrer" className="text-neutral-400 hover:text-black dark:hover:text-white transition-colors">
@@ -26,9 +33,15 @@ export default function Work() {
                         </a>
                     )}
                     {item.liveLink && (
-                        <a href={item.liveLink} target="_blank" rel="noopener noreferrer" className="text-neutral-400 hover:text-black dark:hover:text-white transition-colors">
-                            <ArrowUpRight size={18} />
-                        </a>
+                        item.liveLink.startsWith('/') ? (
+                            <Link to={item.liveLink} className="text-neutral-400 hover:text-black dark:hover:text-white transition-colors">
+                                <ArrowUpRight size={18} />
+                            </Link>
+                        ) : (
+                            <a href={item.liveLink} target="_blank" rel="noopener noreferrer" className="text-neutral-400 hover:text-black dark:hover:text-white transition-colors">
+                                <ArrowUpRight size={18} />
+                            </a>
+                        )
                     )}
                     {item.paperLink && (
                         <a href={item.paperLink} target="_blank" rel="noopener noreferrer" className="text-neutral-400 hover:text-black dark:hover:text-white transition-colors">
@@ -108,39 +121,6 @@ export default function Work() {
                 </div>
             </div>
 
-            {/* Publications */}
-            {publications.length > 0 && (
-                <div>
-                    <div className="flex items-end justify-between mb-16 px-4 md:px-0">
-                        <h2 className="text-[6vw] leading-[0.8] font-bold tracking-tighter text-neutral-200 dark:text-neutral-800 select-none">
-                            RESEARCH
-                        </h2>
-                    </div>
-                    <div className="grid grid-cols-1 gap-6">
-                        {publications.map((pub) => (
-                            <motion.div
-                                key={pub.id}
-                                initial={{ opacity: 0, y: 20 }}
-                                whileInView={{ opacity: 1, y: 0 }}
-                                viewport={{ once: true }}
-                                className="group border border-neutral-200 dark:border-white/10 p-8 hover:bg-neutral-50 dark:hover:bg-white/5 transition-colors"
-                            >
-                                <div className="flex justify-between items-start">
-                                    <div>
-                                        <h3 className="text-xl font-bold text-neutral-900 dark:text-white mb-2">{pub.title}</h3>
-                                        <p className="text-neutral-600 dark:text-neutral-400 font-light">{pub.shortDescription}</p>
-                                    </div>
-                                    {pub.githubLink && (
-                                        <a href={pub.githubLink} className="text-neutral-400 hover:text-black dark:hover:text-white">
-                                            <ArrowUpRight />
-                                        </a>
-                                    )}
-                                </div>
-                            </motion.div>
-                        ))}
-                    </div>
-                </div>
-            )}
         </section>
     );
 }

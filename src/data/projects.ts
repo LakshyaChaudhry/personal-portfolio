@@ -1,7 +1,7 @@
 export interface Project {
     id: string;
     title: string;
-    category: 'experience' | 'project' | 'publication';
+    category: 'experience' | 'project' | 'research';
     role?: string; // For timeline / research
     period?: string; // For timeline / research
     shortDescription: string;
@@ -12,6 +12,8 @@ export interface Project {
     liveLink?: string;
     imageUrl?: string;
     color: string;
+    status?: 'in progress';
+    hidden?: boolean;
 };
 
 export const projects: Project[] = [
@@ -61,23 +63,34 @@ export const projects: Project[] = [
         color: "from-blue-500 to-indigo-600",
     },
 
-    // --- Research (Publications) ---
+    // --- Projects & Research ---
+    {
+        id: 'proj-signal',
+        title: "Signal",
+        category: 'project',
+        shortDescription: "Brutalist productivity tracker with a locally fine-tuned AI coach, trained on personal behavioral data and productivity literature. Runs entirely on Apple Silicon.",
+        fullDescription: "A brutalist productivity tracker with a locally fine-tuned Llama 3.1 8B AI coach. Trained on 1,442 examples combining productivity literature and 70 days of personal behavioral logs. The entire stack—training, serving, inference—runs on a single M3 Ultra Mac Studio.",
+        technologies: ["MLX", "Llama", "Finetuning", "Data Synthesis"],
+        liveLink: "/blog/signal-ai-coach",
+        color: "from-neutral-500 to-neutral-700",
+    },
     {
         id: 'res-1',
         title: "Alignment Faking Detection",
-        category: 'publication',
-        role: "Mechanistic Interpretability Researcher", // Inferred from description
+        category: 'research',
+        role: "Mechanistic Interpretability Researcher",
         period: "Sep 2025 – Present",
         shortDescription: "Mechanistic interpretability research on alignment faking in misaligned LoRA-tuned models.",
-        fullDescription: "Conducting mechanistic interpretability research on alignment faking in misaligned LoRA-tuned Llama-3-70B models (“HAL9000”, “Pacifist”) using eval-awareness, noise-injection, and novel probing technique experiments. [Algoverse AI (Blue Team) × Redwood Research (Red Team)]",
-        technologies: ["Mech Interp", "Llama-3", "LoRA", "PyTorch"],
+        fullDescription: "Conducting mechanistic interpretability research on alignment faking in misaligned LoRA-tuned Llama-3-70B models ('HAL9000', 'Pacifist') using eval-awareness, noise-injection, and novel probing technique experiments. [Algoverse AI (Blue Team) x Redwood Research (Red Team)]",
+        technologies: ["TransformerLens", "Mech Interp", "PyTorch"],
         githubLink: "https://github.com/LakshyaChaudhry/bench-af",
         color: "from-purple-500 to-violet-600",
+        status: 'in progress',
     },
     {
         id: 'res-2',
         title: "Belief Graph State Management",
-        category: 'publication',
+        category: 'research',
         role: "Theory of Mind Research",
         period: "Nov 2025 – Present",
         shortDescription: "Developing explicit belief graph architecture for LLM trading agents.",
@@ -85,9 +98,8 @@ export const projects: Project[] = [
         technologies: ["LLM Agents", "Multi-Agent Sim", "Graph Theory"],
         githubLink: "https://github.com/tqmsh/hanabi-belief-graph/tree/belief_graph_variants",
         color: "from-pink-500 to-rose-600",
+        hidden: true,
     },
-
-    // --- Projects ---
     {
         id: 'proj-1',
         title: "Portfolio",
