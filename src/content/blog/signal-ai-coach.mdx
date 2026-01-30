@@ -101,6 +101,8 @@ I ran 700 iterations at a learning rate of 1e-5. The loss curve was satisfying:
 | 600       | 0.706      | 0.769    |
 | 700       | 0.585      | 0.779    |
 
+![LoRA fine-tuning loss curve — Llama 3.1 8B](/assets/blog/loss_curve.png)
+
 The validation loss plateaued around 0.76-0.78 while training loss kept dropping, which I came to learn, was a sign the model was starting to memorize rather than generalize. I stopped at 700 iterations. In retrospect, I probably could have stopped at 400-500 and gotten similar results with less overfitting risk.
 
 **Resource usage:** ~25GB peak memory, ~620 tokens/second throughput. Training took roughly  ~45 minutes total
@@ -114,6 +116,8 @@ After training, I merged the LoRA adapters into the base model using MLX's `fuse
 3. Model responds with context-aware coaching
 
 No rate limits, no API costs, no latency from round-trips to a data center.
+
+![LM Studio serving the fine-tuned Signal AI Coach model locally](/assets/blog/lm_studio.png)
 
 ---
 
@@ -140,6 +144,8 @@ LM Studio's API supports streaming, so the coach's responses appear token-by-tok
 **3. Brutalist UI**
 
 Signal's interface is aggressively minimal: black background, IBM Plex Mono, no gamification. This matches the philosophy of the tracking system: raw honesty over feel-good metrics. The coach sits in a slide-out panel, available but not intrusive.
+
+![Signal Coach — slide-out panel with personalized advice](/assets/blog/signal_coach.png)
 
 ---
 
@@ -178,6 +184,8 @@ Some things I'm still thinking about:
 ## The Actual Product
 
 Signal was about two things for me: a brutalist productivity tracker (the fullstack) and a fine-tuned AI coach. The tracker is the foundation: without honest data, the coach has nothing to work with, and I'd have no data to 'personally' fine tune llama on. The coach is the leverage as it turns passive logging into active optimization.
+
+![Signal timeline — daily log with quality-rated activity blocks](/assets/blog/signal_timeline.png)
 
 The tracker itself is a full Next.js app with Prisma and PostgreSQL hosted locally on Docker with timeline visualization, live timer with picture-in-picture, dynamic day boundaries based on sleep. But that's a post for another time. (built in < 3 days as well)
 
