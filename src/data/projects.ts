@@ -65,6 +65,16 @@ export const projects: Project[] = [
 
     // --- Projects & Research ---
     {
+        id: 'proj-synthbench',
+        title: "SynthBench",
+        category: 'project',
+        shortDescription: "Benchmarking text-to-image synthetic data vs. traditional augmentation for zero-shot visual classification. Achieved 81% accuracy with zero real training examples.",
+        fullDescription: "Benchmarking text-to-image synthetic data vs. traditional augmentation for zero-shot visual classification. Achieved 81% accuracy with zero real training examples.",
+        technologies: ["Computer Vision", "Synthetic Data", "Zero-Shot", "PyTorch"],
+        liveLink: "/blog/synthbench",
+        color: "from-neutral-500 to-neutral-700",
+    },
+    {
         id: 'proj-signal',
         title: "Signal",
         category: 'project',
