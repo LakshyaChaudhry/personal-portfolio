@@ -1,0 +1,200 @@
+---
+title: "SynthBench: 81% Zero-Shot Accuracy from AI-Generated Training Data"
+date: "2026-02-03"
+description: "Benchmarking text-to-image synthetic data vs. traditional augmentation for zero-shot visual classification. Achieved 81% accuracy with zero real training examples."
+tags: ["computer-vision", "synthetic-data", "zero-shot", "pytorch"]
+published: true
+---
+
+![Data Sources: Real vs FLUX.2 Pro vs Augmentation](/assets/blog/synthbench_data_comparison.png)
+
+I've been gravitating toward physical AI and robotics. But before a robot can grasp an object, it has to solve a more fundamental problem: _what am I looking at?_ Object classification is the first step in any manipulation pipeline. In the sim-to-real transfer literature, _zero-shot transfer_ is where the model is given zero examples from the target domain (real photos) during training, and evaluated entirely on real images the model has never seen.
+
+So I built SynthBench to be my introduction to *zero-shot-learning*, measuring how far that transfer could take you. I generated ~1,800 synthetic images using FLUX.2 Pro, trained a ResNet-18 classifier on them, and tested it on photos I took with my iPhone in my apartment. The result: **81% accuracy with zero real training data.** And when I added just 5 real photos per class, it jumped to 86% which beat a model trained on only those 5 real photos by 7 points. Synthetic data doesn't replace real data, but it gives you a massive head start when real data is scarce.
+
+Here's what I learned about its upside and its limitations.
+
+---
+
+## The Setup
+
+I chose a simple task: classify 6 common desk objects: a logitec mouse, pen, Iphone 17 Pro, laptop, water bottle, and Rubik's cube. Simple enough to iterate quickly, concrete enough to produce meaningful results.
+
+Three datasets, one test set:
+
+**1. Real Photos (Ground Truth)**
+
+I walked around my apartment with my iPhone and took pictures of each object from 5 angles (bird's eye, 45°, eye level, low angle, side profile) across 4 locations (desk, bed, lobby downstairs, and kitchen) under 3 lighting conditions (lamp, overhead/natural, and LED). I got a total of 244 total training images, 63 held out for testing (~roughly 50 per class). These are messy, real-world photos with cluttered backgrounds, inconsistent lighting, objects not centered perfectly, and on different textured surfaces. This real world variation in the data was what I was going for.
+
+**2. Text-to-Image Synthetic (FLUX.2 Pro)**
+
+I wrote a prompt template system that systematically varies object description, background surface, lighting condition, camera angle, and photo style. For example:
+
+```
+"DSLR photo of a wireless computer mouse on a dark wooden desk,
+warm lamp light, photographed from a 45 degree angle"
+```
+
+From these templates (which were random combinations of each other) I generated 1,773 images across all 6 categories using FLUX.2 Pro via API. Each category got 280-300 images (some failed in the generation stage due to the prompt being flagged by the guardrails). The images that FLUX.2 PRO generated looked remarkably realistic.
+
+Resource cost: $52.98, Time: ~1 hour
+
+**3. Programmatic Augmentation (Baseline)**
+
+This is the "traditional" approach for comparison. I took my real training photos and applied aggressive random transforms: crops, rotations, color jitter, perspective warping, Gaussian blur. This produced ~1,800 augmented images from the 244 real seeds.
+
+The critical thing to note: augmentation starts from real data and transforms it. Text-to-image generates from scratch using only a text description. Augmentation had an **inherent advantage** because it's already seen the real distribution so it's recycling knowledge, not creating it. Inherently the augmentation's results were mainly unusable, primarily because the transformations weren't aggressive enough as it appeared.
+
+---
+
+## The Model
+
+I used ResNet-18 with pretrained ImageNet weights from the `timm` library. It's small enough to train in minutes on my Mac Studio, yet large enough to learn meaningful visual features. I fine-tuned the full model (not just the head) for 20 epochs at a learning rate of 1e-3, batch size of 32.
+
+```
+Training config:
+- Model: ResNet-18 (pretrained on ImageNet)
+- Framework: PyTorch + timm
+- Epochs: 20
+- Learning rate: 1e-3
+- Batch size: 32
+- Hardware: M3 Ultra Mac Studio (MPS backend)
+- Training time: ~2-3 minutes per model
+```
+
+All images were resized to 224×224 and normalized to ImageNet statistics.
+
+---
+
+## Zero-Shot Results
+
+I trained three models, each on a different dataset, and evaluated all of them on the same 63 real test photos.
+
+| Training Data                    | Accuracy  | Notes                              |
+| -------------------------------- | --------- | ---------------------------------- |
+| Real photos (244 images)         | 98.4%     | Upper bound — trained on real data |
+| Augmented (1,800 images)         | 98.4%     | Starts from real seeds*            |
+| **T2I synthetic (1,773 images)** | **81.0%** | **Zero real training examples**    |
+
+81% from purely generated images. The model has never seen a real photograph during training, and it correctly classifies 4 out of 5 real images.
+
+But the confusion matrix reveals where it struggles:
+
+![Confusion Matrix — t2i_zero_shot (81.0%)](/assets/blog/synthbench_confusion_t2i.png)
+
+Phone was the weakest category, **4 out of 12** phones got misclassified as water bottles. My Iphone 17 is bright orange, and maybe somewhat of an unorthodox shape compared to the phones Flux.2 PRO was generating, which, I suspect, may have confused the model's understanding of what phones look like (since most synthetically generated phones were black rectangles). Rubik's cube also had confusion, with 2 misclassified as laptops and 1 as a pen. These are the categories where FLUX's "idea" of the object diverged most from my specific real objects, or due to the fact that there were similar object near each other in the photo taken and the primary object in the frame was misclassified.
+
+Compare this to the augmentation confusion matrix, which is nearly perfect:
+
+![Confusion Matrix — aug_zero_shot (98.4%)](/assets/blog/synthbench_confusion_aug.png)
+
+This makes sense. Augmentation literally starts from photos of my objects. It's not learning to recognize objects from scratch, it's memorizing what my specific objects look like and learning to be invariant to minor perturbations. T2I is solving a fundamentally harder problem: learning object categories from generated exemplars that may look nothing like the actual test objects. The fact that it still hits 81% is the interesting result, the sim-to-real gap exists, but it's smaller than I expected.
+
+---
+
+## Few-Shot: Closing the Gap
+
+The more practically useful question: **If I combine synthetic data with a small number of real examples, how quickly does the gap close?**
+
+I ran experiments mixing synthetic data with 5, 10, and 25 real images per class. Each configuration was run 3 times with different random seeds and averaged (because with only 5 images, which specific 5 you pick matters a lot and could sway the results heavily).
+
+| Method | 0 real | 5 real | 10 real | 25 real |
+|--------|--------|--------|---------|---------|
+| T2I + Real | 81.0% | 86.2% ± 3.3% | 89.4% ± 3.3% | 92.1% ± 2.7% |
+| Augmented + Real | 98.4% | 97.9% ± 2.1% | 98.4% ± 1.3% | 99.5% ± 0.9% |
+| Real Only | 98.4%* | 79.4% ± 5.9% | 93.1% ± 4.2% | 98.9% ± 0.9% |
+
+*(\*Real Only 0-shot = trained on all 244 real images, not truly zero-shot)*
+
+![Few-Shot Learning Curves: Synthetic Data + Real Data](/assets/blog/synthbench_few_shot_curves.png)
+
+The key finding: **T2I + 5 real (86.2%) beats Real Only with 5 real (79.4%) by almost 7 points.** When real labeled data is scarce, synthetic pre-training gives you a meaningful advantage. Those 1,773 generated images taught the model general visual concepts of what mice and bottles and laptops tend to look like, and just 5 real examples were enough to calibrate it to *my specific* objects and environment.
+
+The error bars tell an important story too. Real Only at 5 shots has ± 5.9% variance suggesting which 5 photos you happen to pick can swing accuracy by nearly 12 points. T2I + Real at 5 shots has only ± 3.3% variance. Again if we averaged over a greater amount of runs (>3) we would reduce the variance and have a smaller overall swing in accuracy. Synthetic data stabilizes the model because it's already seen hundreds of variations, so it's less sensitive to the specific few real examples you provide.
+
+By 25 real examples per class, all methods converge to ~92-99%. The advantage of synthetic data is largest when real data is **most scarce** which is exactly the scenario where you'd actually want to use it.
+
+---
+
+## What Actually Drives Synthetic Data Quality?
+
+I ran two ablation studies to understand which variables matter most when generating synthetic training data.
+
+### Ablation 1: Prompt Diversity
+
+I compared three conditions:
+- **Low-diversity:** 100 images per class generated from a single generic prompt (ex: "a photo of a computer mouse")
+- **Diverse:** 100 images per class generated from my full prompt template system (varying backgrounds, lighting, angles, styles)
+- **Diverse + full scale:** All ~300 images per class with diverse prompts
+
+![Ablation: Prompt Diversity Impact](/assets/blog/synthbench_ablation_prompt_diversity.png)
+
+This was one of the biggest finding in the project. **Prompt diversity alone accounts for a 10-point accuracy boost** (59.3% → 69.3%) at equal dataset sizes. Scaling up from 100 to 300 diverse images adds another 11 points. But here's what's striking: diverse prompts at 100 images (69.3%) dramatically outperform low-diversity prompts at 100 images (59.3%) despite having the exact same dataset size.
+
+The implication: if you're generating synthetic data, prompt diversity and detail make a HUGE difference. Generating 100 images from the same prompt is worse than generating 100 images from varied prompts as the results showed. The model needs to see objects in different contexts to learn what the object *actually is* rather than memorizing that "mouse = small dark blob on a white desk."
+
+### Ablation 2: Dataset Size
+
+How many synthetic images do you actually need?
+
+![Ablation: T2I Dataset Size Impact](/assets/blog/synthbench_ablation_dataset_size.png)
+
+Returns diminish quickly. Going from 100 to 200 images per class gains 3.7 points (74.6% → 78.3%). Going from 200 to 300 gains only 1.1 points (78.3% → 79.4%). The curve is flattening. For this task, ~200 diverse synthetic images per class captures most of the benefit. Generating more images beyond that barely moves the needle.
+
+Combined with the prompt diversity result, the recipe is clear: **diverse prompts > more images**. 200 images with good prompt variation gets you 78% of what 300 images with the same variation achieves. But 100 images with poor prompt variation only gets you 59%.
+
+---
+
+## What Surprised Me
+
+**Prompt engineering is data engineering.** I went into this thinking the generation model (FLUX.2 Pro) would be the main variable. It's not. How you write the prompts determines more of the downstream accuracy than how many images you generate or which model you use. A 21-point swing from prompt diversity alone (59.3% → 80.4%) is a bigger effect than tripling the dataset size (74.6% → 79.4%). This has real implications for anyone building synthetic data pipelines, the prompt template system is the product, not just a preprocessing step.
+
+**Augmentation's advantage is unfair, but instructive.** Augmentation hitting 98.4% zero-shot looks impressive until I realized that it just starts from real data. It's not learning to recognize objects from scratch, it's memorizing what my specific objects look like and learning to be invariant to minor perturbations. T2I is solving a fundamentally harder problem: learning object categories from generated exemplars that may look nothing like the actual test objects. The 81% vs 98.4% comparison is apples to oranges, and the few-shot curves tell the real story.
+
+**The sim-to-real gap is category-dependent.** Mouse and pen transferred almost perfectly (10/10 correct). Phone was terrible (7/12). This makes intuitive sense as FLUX's concept of "mouse" is pretty universal (small, curved, on a desk) or also suggests the mouse features has largely stayed the same in recent decades, but "phone" varies wildly (my orange iPhone vs. FLUX's generic black rectangles). This suggests synthetic data works best for objects with canonical, consistent appearances and struggles with objects that look very different from the "average" generated version.
+
+**5 real examples is a magic number.** The jump from 0 to 5 real examples with T2I pretraining (81% → 86%) is disproportionately large compared to 5→10 or 10→25. Those first few real examples do the heavy lifting of bridging the domain gap. After that, additional real examples have diminishing returns because the synthetic pre training already provided the broad visual knowledge.
+
+---
+
+## What I'd Do Differently
+
+**Test on a harder task.** Six visually distinct desk objects is a clean benchmark, but it's not challenging enough to stress-test synthetic data's limits. I'd like to try fine-grained classification like different breeds of dogs, different species of birds, different types of screws. Something where the visual differences between classes are subtle and the model can't rely on coarse shape features. I suspect the sim-to-real gap would be much larger there.
+
+**Compare generation models.** I only used FLUX.2 Pro. A direct comparison with Stable Diffusion, Midjourney, and Grok Imagine would show whether the generation model matters as much as prompt diversity. My hypothesis: it matters less than you'd think, but I don't have the data to back that up yet.
+
+**Domain-specific prompt optimization.** My prompt templates were written by hand, which worked but probably isn't optimal. I'd like to build a feedback loop: generate images, train a model, find the failure cases, generate targeted images to address those failures, retrain. Essentially a self-improving data generation pipeline. This is what companies are trying to do at enterprise scale.
+
+**More rigorous evaluation.** Running each experiment 3 times with different seeds was a good start, but with a 63-image test set, the confidence intervals are wide. A larger test set (200+ images) would make the results more statistically robust.
+
+---
+
+## Open Questions
+
+**Model collapse and synthetic data at scale.** A mentor of mine recently introduced me to the concept of _model collapse_: as AI-generated content proliferates and gets ingested into training data, models trained on that data degrade over successive generations. Synthetic data is powerful, but at scale it introduces subtle distribution shifts that compound. Understanding where synthetic data helps and where it breaks down feels like one of the more important problems in the field. Companies are tackling this at the enterprise level, and I'd love to eventually work on these problems.
+
+**Does this scale to 100+ classes?** My 6-class benchmark is clean but artificial. Real-world applications have hundreds or thousands of categories. Does prompt diversity matter more or less at scale? Do certain classes inherently resist synthetic data generation?
+
+**What about video and temporal data?** For robotics, my next target domain, the relevant data isn't static images but sequences of frames showing motion, grasping, manipulation, and even raw sensor data. Can text-to-video models generate useful training data for robotic manipulation policies? The sim-to-real gap might be much larger when temporal dynamics are involved.
+
+**Can you do this in reverse?** I used text-to-image to generate training data. But you could also use image-to-text to automatically label real data, creating a different kind of synthetic data pipeline. Which approach is more efficient for a given labeling budget? And would you need an LLM as a judge to accurately label at scale?
+
+**Synthetic data for fine-grained sim-to-real in robotics.** The natural extension of this project is generating synthetic training data for robotic manipulation tasks like grasping, pick-and-place, tool use, and measuring transfer to real robotic systems. That's where I hope to extend this project next.
+
+---
+
+## The Takeaway
+
+SynthBench taught me that synthetic data from text-to-image models is genuinely useful, but not in the way I expected. It's not a replacement for real data, synthetic data is instead a major complement for scarce real data. Train on synthetic first to learn broad visual concepts, then fine-tune on a small amount of real data to bridge the domain gap. With this approach, 5 real examples + synthetic pre-training beats 5 real examples alone by 7 points.
+
+The most surprising finding for me was about prompts. How you write the text descriptions that generate your synthetic data matters more than how many images you generate. Prompt diversity alone swung accuracy by 21 points. If I had to condense this entire project into one sentence for someone building a synthetic data pipeline: **invest more of my time in prompt diversity, rather than dataset size. (at least on a smaller scale)**
+
+The whole project: data generation, model training, ablation studies, evaluation ran on my M3 Ultra Mac Studio, took about 4 days, and cost $71.01 (additional ~$19 for the Ablation 1 experiments) in Replicate API credits. The dataset and all results are on [HuggingFace](https://huggingface.co/datasets/LakshC/SynthBench), code is on [GitHub](https://github.com/LakshyaChaudhry/SynthBench).
+
+---
+
+*-Lakshya Chaudhry*
+
+---
+
+I'd like to extended this project in the future to robotic manipulation, sim-to-real transfer for grasping and pick-and-place tasks. If you're working on synthetic data pipelines or sim-to-real transfer, I'd love to hear what you're building, reach out on [Twitter/X](https://x.com/LakshChaudhry) or [email](mailto:lakshchaudhry@gmail.com).

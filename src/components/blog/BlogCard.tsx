@@ -20,7 +20,7 @@ export default function BlogCard({ post, index }: BlogCardProps) {
       >
         <div className="flex items-center gap-4 mb-2">
           <time className="text-neutral-500 font-mono text-xs tracking-widest">
-            {new Date(post.date).toLocaleDateString('en-US', {
+            {new Date(post.date + 'T00:00').toLocaleDateString('en-US', {
               year: 'numeric',
               month: 'short',
               day: 'numeric',

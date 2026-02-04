@@ -17,7 +17,7 @@ export default function BlogPost() {
       <article>
         <header className="mb-12">
           <time className="text-neutral-500 font-mono text-xs tracking-widest uppercase">
-            {new Date(meta.date).toLocaleDateString('en-US', {
+            {new Date(meta.date + 'T00:00').toLocaleDateString('en-US', {
               year: 'numeric',
               month: 'long',
               day: 'numeric',

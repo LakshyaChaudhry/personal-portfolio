@@ -1,6 +1,7 @@
 import type { ComponentType } from 'react'
 import * as helloWorld from './hello-world.mdx'
 import * as signalAiCoach from './signal-ai-coach.mdx'
+import * as synthbench from './synthbench.mdx'
 
 export interface BlogPostMeta {
   slug: string
@@ -19,6 +20,7 @@ interface BlogPostModule {
 const postModules: Record<string, BlogPostModule> = {
   'hello-world': helloWorld as unknown as BlogPostModule,
   'signal-ai-coach': signalAiCoach as unknown as BlogPostModule,
+  'synthbench': synthbench as unknown as BlogPostModule,
 }
 
 export function getAllPosts(): BlogPostMeta[] {
