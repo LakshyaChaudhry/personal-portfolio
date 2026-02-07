@@ -1,0 +1,226 @@
+---
+title: "I Built an Agent That Turns Research Papers into Obsidian Notes I Actually Learn From"
+date: "2026-02-07"
+description: "How a 6-tool agentic pipeline turns dense arXiv papers into structured, linked Obsidian notes, helping me build real understanding of AI research from the ground up."
+tags: ["agents", "LLM", "python", "CLI"]
+published: true
+---
+
+<video autoPlay loop muted playsInline style={{width: '100%', borderRadius: '0.5rem', marginBottom: '1.5rem'}}>
+  <source src="/assets/blog/Distill.mp4" type="video/mp4" />
+</video>
+
+I've been diving deeper into AI research: mechanistic interpretability, synthetic data, robotics. All the areas I want to work in professionally. As I read more papers, I realized the hardest part isn't the math or the methods. It's building the kind of compounding understanding where each paper strengthens your grasp of the ones that came before. Academic papers are dense by design, and when you're still building your mental map of a field, it's easy to read something, sort of get it, and move on without the understanding really sticking.
+
+I wanted a tool that could distill complex papers into structured, digestible formats that I could actually learn from — which broke down the key contribution, methodology, and results simply, while connecting them to the concepts I'm already building up in my Obsidian knowledge graph. Not a shortcut to skip reading, but a scaffold that makes reading papers _productive_ even when I'm early in a field.
+
+So I built Distill: an agentic CLI tool that takes an arXiv URL, parses the full paper, generates a structured analysis, identifies research gaps, scans my Obsidian vault for related concepts, and renders a complete markdown note with inline `[[wikilinks]]` all from a single command. The whole pipeline is orchestrated by Claude's tool-calling API, and I built every tool from scratch.
+
+`distill https://arxiv.org/abs/2301.02111` → structured, linked note in my vault. That's it.
+
+Here's how I built it and what I learned about agentic systems along the way.
+
+---
+
+## Why an Agent (and Not a Script)
+
+The easy approach would be a linear Python script: parse → digest → gaps → write. And honestly, that would work for 90% of cases. But I wanted to learn the agentic pattern and build the loop where a model decides which tool to call next based on intermediate results, because that's the architecture behind the systems I want to build professionally.
+
+The practical benefit: when a vault path is provided, the agent runs 6 tools. Without a vault, it intelligently skips `scan_vault` and `link_concepts` and runs only 4. The agent makes this decision, not a hardcoded `if` statement. It's a small thing, but it's the right abstraction for extending the system later.
+
+The agentic loop itself is simple:
+
+```
+┌─────────────────────────────────────────────────┐
+│                 Distill Agent                    │
+│               (Claude Sonnet)                    │
+│                                                  │
+│  ┌─────────┐   ┌────────┐   ┌─────────┐        │
+│  │ Decide  │──>│  Call  │──>│ Process │──┐      │
+│  │  next   │   │  tool  │   │ result  │  │      │
+│  │  tool   │   │        │   │         │  │      │
+│  └─────────┘   └────────┘   └─────────┘  │      │
+│       ^                                   │      │
+│       └───────────────────────────────────┘      │
+│                (loop until done)                  │
+└─────────────────────────────────────────────────┘
+```
+
+Claude receives a system prompt listing 6 tools and instructions to process the paper. It decides the order, handles the data flow between tools, and stops when the note is written.
+
+---
+
+## Building the Pipeline
+
+### Tool 1: Paper Parser
+
+The parser is the foundation as everything downstream depends on clean extraction. I used Azure Document Intelligence (the prebuilt layout model) for text and PyMuPDF for figures. This combination was proven from my Corteva Agriscience work on non-standardized document extraction, so I knew it could handle the variety of PDF layouts you see on arXiv.
+
+The parser does five things:
+
+1. **PDF acquisition**: accepts an arXiv URL or local path, auto-converts arXiv abstract URLs to PDF URLs
+2. **Azure extraction**: sends the PDF to Document Intelligence, gets back paragraphs with role tags, groups them under section headers
+3. **Caching**: before calling Azure, checks if the JSON response already exists locally (saves API costs during development and testing)
+4. **Metadata extraction**: pulls title, authors, date, arXiv ID, and source URL from the Azure response
+5. **Figure extraction**: PyMuPDF pulls images with captions and page numbers
+
+Everything gets packaged into a single `PaperData` dataclass:
+
+```python
+@dataclass
+class PaperData:
+    metadata: dict          # title, authors, date, arxiv_id, source_url
+    sections: dict[str, str]  # section_name -> text content
+    full_text: str          # concatenated raw text as fallback
+    figures: list[dict]     # [{path, caption, page_number}, ...]
+    tables: list[str]       # markdown-formatted tables
+    source: str             # original URL or file path
+```
+
+The caching layer seems minor but saved me a ton during development. Azure Document Intelligence charges per page, and I was iterating on the downstream tools constantly. Without the cache, every test run would have cost money for the same extraction.
+
+### Tool 2: Vault Scanner
+
+Pure Python, no LLM. Recursively scans an Obsidian vault directory for `.md` files and returns a list of note titles. For large vaults (500+ notes), it pre-filters by keyword relevance to the paper to avoid overwhelming the linker with irrelevant concepts.
+
+This is the simplest tool in the pipeline, but it's essential as it gives the concept linker (Tool 4) the vocabulary of my knowledge graph.
+
+### Tool 3: Paper Digest
+
+This is where the LLM does the heavy analytical lifting. Claude Sonnet receives the extracted paper content and produces a structured JSON analysis:
+
+```python
+@dataclass
+class PaperDigest:
+    title: str
+    authors: list[str]
+    date: str
+    venue: str              # conference/journal if detectable, else "ArXiv"
+    arxiv_id: str | None
+    tags: list[str]         # auto-generated topic tags (3-5)
+    key_contribution: str   # 1-2 sentences: the novel contribution
+    methodology: str        # concise summary of approach
+    core_results: str       # key findings with metrics
+    limitations: str        # acknowledged + unacknowledged
+    connections: list[str]  # related concepts for Obsidian linking
+```
+
+The system prompt was carefully designed. The most important instruction: "For `key_contribution`, what is the ONE thing this paper adds? Not a summary rather the novel contribution." Without this, the model defaults to writing a generic abstract-style summary. I wanted it to extract signal, not compress.
+
+For long papers, I prioritize sections in order: abstract, introduction, methods, results, conclusions, discussion, truncate or skip references, appendices, and lengthy related work sections. Token budget is ~80K, which comfortably fits most papers that I tested on.
+
+### Tool 4: Concept Linker
+
+This is where the agent does real reasoning, and the part I'm most proud of. The linker receives two inputs: the digest text fields and the list of note titles from my vault. It then decides which concepts are _genuinely discussed_ in the paper and embeds `[[wikilinks]]` inline.
+
+The rules are strict:
+
+- Only link to notes that exist in the vault
+- Link each concept at most once per field
+- Don't alter the meaning of the text and just add brackets
+
+This means Claude has to reason about whether "Transformer" in the methodology section refers to the architecture concept in my vault or is just a passing mention. It has to decide that "Attention" is mentioned but not central enough to link, while "Neural Codec" is a key concept worth connecting.
+
+```
+Input:  "Uses a neural codec for discrete audio tokens
+         with a transformer decoder..."
+
+Output: "Uses a [[Neural Codec]] for discrete audio tokens
+         with a [[Transformer]] decoder..."
+```
+
+This is the step that would take me a couple minutes manually, scanning my vault, deciding which links matter, placing them carefully. The LLM does it in seconds, and frankly does it more consistently than I do.
+
+### Tool 5: Gap Identifier
+
+Given the digest, Claude identifies research opportunities:
+
+```python
+@dataclass
+class ResearchGaps:
+    open_questions: list[str]      # 3-5 unanswered questions
+    extension_ideas: list[str]     # 2-4 concrete project ideas
+    scaling_considerations: str    # what breaks at 10x/100x scale
+    methodological_gaps: list[str] # 1-3 approach weaknesses
+```
+
+The system prompt here pushes for specificity: "Not 'do more experiments' but 'apply this method to [specific domain] to test [specific hypothesis].'" I wanted actionable research ideas, not vague suggestions. The prompt tells the model to think like a researcher looking for their next project. This proved to be quite the helpful brainstorm-er for my next project ideas.
+
+### Tool 6: Note Writer
+
+Jinja2 template rendering. Takes all the structured data: `PaperData`, `PaperDigest`, `ResearchGaps` and produces an Obsidian markdown note with embedded figures, wikilinks, and research gap checklists. The template is straightforward but produces clean, consistent output every time.
+
+The final note includes status tracking (`status: unread` in frontmatter), source URLs for citation, and research gaps as checkboxes so I can track which extension ideas I've actually explored.
+
+---
+
+## Bugs I Encountered
+
+Two problems consumed some time for me:
+
+**The infinite loop.** After the agent finished creating the note, all 6 tools called successfully, it kept going. The model would look at the conversation history, see that tools were available, and decide to call something again or hallucinate a new task. I had to implement explicit stop/break logic: once `write_note` returns successfully, the loop terminates. This sounds obvious in retrospect, but getting the stopping condition right for an agentic loop was tricky. The model, or the way I designed the agentic loop, didn't naturally know when to stop.
+
+**"Agentic" vs. sequential.** My first version called 4 tools in strict order. Claude made the "decision" of which tool to call next, but there was only ever one valid choice at each step. That wasn't really agentic, it's simply a pipeline. The solution was adding the vault linking feature: with a vault path, the agent runs 6 tools; without one, it runs 4. The agent now makes a real branching decision based on input. It's still mostly sequential, but the conditional logic is genuinely model-driven this time.
+
+---
+
+## Making It Frictionless
+
+The last phase was about removing friction. I didn't want to edit a URL in `main.py` and `cd` into the project directory every time I found a paper. So I:
+
+1. **Added CLI access**: `python3 -m distill <url>` with argument parsing for output directory, vault path, and a `--no-vault` flag
+2. **Made it a global package**: `pip3 install -e .` turns it into an installable package, so I can run `distill <url>` from anywhere on my machine
+
+This sounds trivial, but it's the difference between a tool I actually use and a tool that sits in a repo. The friction of navigating to a directory and editing a file was enough to make me not use my own tool. Now it's as fast as copying a URL from arXiv.
+
+---
+
+## What Surprised Me
+
+**The concept linker was the highest-value tool.** I expected the digest to be the highest-value tool, automated paper summarization feels like the obvious win. But in practice, the concept linker is what actually deepens my understanding. It catches connections between a new paper and concepts I've already studied that I would have missed entirely. When I see a wikilink to `[[Superposition]]` in a paper I didn't expect to relate to it, that's a learning moment I wouldn't have had otherwise.
+
+**Caching is not optional.** I added the Azure response cache almost as an afterthought, but it ended up being essential to my development velocity. Without it, every iteration on the digest/gaps/linker prompts would have required re-extracting the same PDF. At Azure's per-page pricing, the cache probably saved me ~$10 during development, and more importantly it saved minutes of waiting per test run.
+
+**Stop conditions are the hardest part of agents.** The actual tool implementations were straightforward. The agentic loop logic was straightforward. But getting the agent to _stop_ reliably that was where I spent the most debugging time. Explicit termination logic after the final tool call was the fix, but I suspect this was something with a simple solution that I overlooked.
+
+**Section prioritization matters more than I expected.** My first version sent the entire paper text to the digest tool. For longer papers, this hit token limits and the model's analysis quality degraded. It would summarize everything equally rather than focusing on the key contributions. Prioritizing abstract → introduction → methods → results → conclusions and dropping appendices and verbose related work sections produced much sharper digests.
+
+---
+
+## What I'd Do Differently
+
+**Parallel tool calls.** Currently, `scan_vault` and `digest_paper` run sequentially, but they're independent. Neither of them needs the other's output, running them in parallel would cut total pipeline time. Same for `identify_gaps` and `link_concepts`, which both only need the digest. The current sequential architecture leaves performance on the table.
+
+**Smarter vault filtering.** For large vaults, the keyword pre-filter is crude. I'd like to use embeddings: embed all vault note titles and the paper abstract, then only pass the top-K most semantically similar notes to the linker. This would scale better and catch connections that keyword matching misses, like linking a paper on "activation patching" to my note on "causal tracing."
+
+**Multi-paper synthesis.** Right now, Distill processes one paper at a time. But maybe in the future, I want to process 5-10 related papers and have the agent identify themes, contradictions, and gaps _across_ papers. This would require a new synthesis tool and a different note template, but the agentic architecture makes it extensible.
+
+---
+
+## Open Questions
+
+**How do you evaluate an agent's "reasoning"?** The concept linker makes genuine decisions — link this concept, skip that one. But I have no way to measure decision quality at scale. I can spot-check individual notes, but I can't tell if the linker is systematically missing certain types of connections or making spurious links. Is there a lightweight evaluation framework for this kind of semi-structured LLM output?
+
+**Can the gap identifier generate _novel_ research ideas?** Right now, it identifies gaps based on what the paper says and doesn't say. But truly interesting research ideas often come from connecting a paper's method to a completely different domain. Would giving the gap identifier access to my full vault, not just the current paper, produce more creative extension ideas? Or would it just hallucinate connections?
+
+**How would this work for non-arXiv papers?** The parser assumes a relatively standard academic paper structure: abstract, introduction, methods, results, conclusion. Industry whitepapers, blog posts, and technical reports don't follow this format. Extending Distill to handle diverse document types would require the digest tool to be more adaptive about where to find key information.
+
+---
+
+## The Takeaway
+
+Distill taught me a lot about agentic systems:
+
+On agents: building them is less about the individual tools and more about the glue. State management, stop conditions, data flow between steps, and the decision logic that makes it more than a pipeline. Each tool was straightforward to build; the parser, digest, linker, and writer are all under 200 lines each. But orchestrating them into a reliable system that handles edge cases and terminates cleanly took more iteration than the tools themselves.
+
+I'm still early in my research journey. I don't pretend that running `distill` on a paper replaces the hard work of actually understanding it. But it gives me a scaffold, a structured, connected starting point that makes the hard work of understanding _productive_. I spend less time on formatting and linking and more time on the part that matters: thinking about what the paper actually means and how it fits into what I'm building toward.
+
+The whole project, all 6 tools, the agentic loop, the CLI, the vault integration, runs from a single terminal command. That's the right level of friction for a tool I actually want to use every time I find a paper worth reading. Distill was built in 4 days.
+
+---
+
+_-Lakshya Chaudhry_
+
+---
+
+_Distill is on [GitHub](https://github.com/LakshyaChaudhry/Distill). If you're building tools for research workflows or working with agentic architectures, I'd love to hear what you're working on, reach out on [Twitter/X](https://x.com/LakshChaudhry) or [email](mailto:lakshchaudhry@gmail.com)._

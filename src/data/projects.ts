@@ -65,6 +65,16 @@ export const projects: Project[] = [
 
     // --- Projects & Research ---
     {
+        id: 'proj-distill',
+        title: "Distill",
+        category: 'project',
+        shortDescription: "Agentic CLI that turns arXiv papers into structured, linked Obsidian notes using a 6-tool pipeline orchestrated by Claude's tool-calling API.",
+        fullDescription: "Agentic CLI that turns arXiv papers into structured, linked Obsidian notes using a 6-tool pipeline orchestrated by Claude's tool-calling API. Parses PDFs via Azure Document Intelligence, generates structured digests, identifies research gaps, and auto-links concepts to an existing Obsidian knowledge graph.",
+        technologies: ["Agents", "Azure Doc Intel", "Python", "CLI"],
+        liveLink: "/blog/distill",
+        color: "from-neutral-500 to-neutral-700",
+    },
+    {
         id: 'proj-synthbench',
         title: "SynthBench",
         category: 'project',
