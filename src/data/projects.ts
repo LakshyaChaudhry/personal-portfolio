@@ -19,11 +19,22 @@ export interface Project {
 export const projects: Project[] = [
     // --- Experience ---
     {
+        id: 'exp-0',
+        title: "Cisco",
+        category: 'experience',
+        role: "AI/ML Engineering Intern",
+        period: "Summer 2026",
+        shortDescription: "Incoming AI/ML Engineering Intern.",
+        fullDescription: "Incoming AI/ML Engineering Intern at Cisco.",
+        technologies: ["AI/ML"],
+        color: "from-blue-600 to-cyan-500",
+    },
+    {
         id: 'exp-1',
         title: "TrustCircle",
         category: 'experience',
         role: "AI/ML Research Intern",
-        period: "May 2025 – Present",
+        period: "May 2025 – Aug 2025",
         shortDescription: "Built production-ready RAG for emotional-support retrieval.",
         fullDescription: "Built a production-ready RAG for emotional-support retrieval (AI-powered recommendation system that matches students with mental health resources) using OpenAI embeddings + MongoDB Atlas vector search.",
         technologies: ["OpenAI", "MongoDB Atlas", "RAG", "Vector Search"],

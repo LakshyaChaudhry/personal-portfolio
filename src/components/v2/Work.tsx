@@ -107,6 +107,73 @@ export default function Work() {
                 </div>
             </div>
 
+            {/* Education & Certifications */}
+            <div className="mb-32">
+                <div className="flex items-end justify-between mb-16 px-4 md:px-0">
+                    <h2 className="text-[8vw] leading-[0.8] font-bold tracking-tighter text-neutral-200 dark:text-neutral-800 select-none">
+                        EDUCATION
+                    </h2>
+                </div>
+
+                <div className="space-y-12">
+                    <motion.div
+                        initial={{ opacity: 0, x: -20 }}
+                        whileInView={{ opacity: 1, x: 0 }}
+                        viewport={{ once: true }}
+                        className="grid grid-cols-1 md:grid-cols-12 gap-8 border-l border-neutral-200 dark:border-white/10 pl-8 ml-4 md:ml-0"
+                    >
+                        <div className="md:col-span-3 text-neutral-500 font-mono text-sm pt-1">
+                            Aug 2024 – May 2028
+                        </div>
+                        <div className="md:col-span-9">
+                            <h3 className="text-2xl font-bold text-neutral-900 dark:text-white mb-1">Purdue University</h3>
+                            <div className="text-neutral-500 dark:text-neutral-400 font-medium">B.S. Artificial Intelligence</div>
+                            <div className="flex flex-wrap gap-2 mt-2">
+                                <span className="text-xs font-mono text-neutral-500 border border-neutral-200 dark:border-white/10 px-2 py-1 rounded-full">Dean's List</span>
+                            </div>
+                        </div>
+                    </motion.div>
+
+                    <motion.div
+                        initial={{ opacity: 0, x: -20 }}
+                        whileInView={{ opacity: 1, x: 0 }}
+                        viewport={{ once: true }}
+                        transition={{ delay: 0.1 }}
+                        className="grid grid-cols-1 md:grid-cols-12 gap-8 border-l border-neutral-200 dark:border-white/10 pl-8 ml-4 md:ml-0"
+                    >
+                        <div className="md:col-span-3 text-neutral-500 font-mono text-sm pt-1">
+                            2026
+                        </div>
+                        <div className="md:col-span-9">
+                            <h3 className="text-2xl font-bold text-neutral-900 dark:text-white mb-1">Blue Dot Impact</h3>
+                            <div className="text-neutral-500 dark:text-neutral-400 font-medium">Technical AI Safety Course</div>
+                            <div className="flex flex-wrap gap-2 mt-2">
+                                <span className="text-xs font-mono text-neutral-500 border border-neutral-200 dark:border-white/10 px-2 py-1 rounded-full">Certification</span>
+                            </div>
+                        </div>
+                    </motion.div>
+
+                    <motion.div
+                        initial={{ opacity: 0, x: -20 }}
+                        whileInView={{ opacity: 1, x: 0 }}
+                        viewport={{ once: true }}
+                        transition={{ delay: 0.2 }}
+                        className="grid grid-cols-1 md:grid-cols-12 gap-8 border-l border-neutral-200 dark:border-white/10 pl-8 ml-4 md:ml-0"
+                    >
+                        <div className="md:col-span-3 text-neutral-500 font-mono text-sm pt-1">
+                            2026
+                        </div>
+                        <div className="md:col-span-9">
+                            <h3 className="text-2xl font-bold text-neutral-900 dark:text-white mb-1">NVIDIA</h3>
+                            <div className="text-neutral-500 dark:text-neutral-400 font-medium">Building Multimodal AI Agents</div>
+                            <div className="flex flex-wrap gap-2 mt-2">
+                                <span className="text-xs font-mono text-neutral-500 border border-neutral-200 dark:border-white/10 px-2 py-1 rounded-full">Certification</span>
+                            </div>
+                        </div>
+                    </motion.div>
+                </div>
+            </div>
+
             {/* Projects */}
             <div id="projects" className="mb-32">
                 <div className="flex items-end justify-between mb-16 px-4 md:px-0">
