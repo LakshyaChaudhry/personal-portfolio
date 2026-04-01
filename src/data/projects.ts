@@ -12,7 +12,7 @@ export interface Project {
     liveLink?: string;
     imageUrl?: string;
     color: string;
-    status?: 'in progress';
+    status?: 'in progress' | 'COLM 2026 under review';
     hidden?: boolean;
 };
 
@@ -75,6 +75,34 @@ export const projects: Project[] = [
     },
 
     // --- Projects & Research ---
+    // Row 1: Research
+    {
+        id: 'res-1',
+        title: "Alignment Faking Detection",
+        category: 'research',
+        role: "Mechanistic Interpretability Researcher",
+        period: "Sep 2025 – Present",
+        shortDescription: "Mechanistic interpretability research on alignment faking in misaligned LoRA-tuned models.",
+        fullDescription: "Conducting mechanistic interpretability research on alignment faking in misaligned LoRA-tuned Llama-3-70B models ('HAL9000', 'Pacifist') using eval-awareness, noise-injection, and novel probing technique experiments. [Algoverse AI (Blue Team) x Redwood Research (Red Team)]",
+        technologies: ["TransformerLens", "Mech Interp", "PyTorch"],
+        githubLink: "https://github.com/LakshyaChaudhry/bench-af",
+        color: "from-purple-500 to-violet-600",
+        status: 'in progress',
+    },
+    {
+        id: 'res-colm',
+        title: "Don't Make the LLM Read the Graph — Make the Graph Think",
+        category: 'research',
+        role: "Multi-Agent Cooperation Research",
+        period: "Nov 2025 – Present",
+        shortDescription: "Investigating whether belief graphs improve LLM cooperation in Hanabi across 3,000+ trials and four model families. Identified \"Planner Defiance\" — a novel failure mode where LLMs override correct graph recommendations. Under review at COLM 2026.",
+        fullDescription: "Investigating whether belief graphs improve LLM cooperation in Hanabi across 3,000+ trials and four model families. Identified \"Planner Defiance\" — a novel failure mode where LLMs override correct graph recommendations. Under review at COLM 2026.",
+        technologies: ["Multi-Agent", "Hanabi", "Belief Graphs", "LLM Reasoning"],
+        paperLink: "https://openreview.net/forum?id=y3TtQFiodt",
+        color: "from-pink-500 to-rose-600",
+        status: 'COLM 2026 under review',
+    },
+    // Row 2: Distill + SynthBench
     {
         id: 'proj-distill',
         title: "Distill",
@@ -95,6 +123,7 @@ export const projects: Project[] = [
         liveLink: "/blog/synthbench",
         color: "from-neutral-500 to-neutral-700",
     },
+    // Row 3: Signal + Corteva
     {
         id: 'proj-signal',
         title: "Signal",
@@ -106,31 +135,16 @@ export const projects: Project[] = [
         color: "from-neutral-500 to-neutral-700",
     },
     {
-        id: 'res-1',
-        title: "Alignment Faking Detection",
-        category: 'research',
-        role: "Mechanistic Interpretability Researcher",
-        period: "Sep 2025 – Present",
-        shortDescription: "Mechanistic interpretability research on alignment faking in misaligned LoRA-tuned models.",
-        fullDescription: "Conducting mechanistic interpretability research on alignment faking in misaligned LoRA-tuned Llama-3-70B models ('HAL9000', 'Pacifist') using eval-awareness, noise-injection, and novel probing technique experiments. [Algoverse AI (Blue Team) x Redwood Research (Red Team)]",
-        technologies: ["TransformerLens", "Mech Interp", "PyTorch"],
-        githubLink: "https://github.com/LakshyaChaudhry/bench-af",
-        color: "from-purple-500 to-violet-600",
-        status: 'in progress',
+        id: 'proj-2',
+        title: "Corteva SDS & Label Extractor LLM",
+        category: 'project',
+        shortDescription: "Contracted by Corteva Agriscience to engineer a proprietary hybrid RAG system (Vector + Graph) for crop-protection data, improving research efficiency by ~80%.",
+        fullDescription: "Contracted by Corteva Agriscience to engineer a proprietary PDF extraction and hybrid RAG system for crop-protection Labels and Safety Data Sheets. The system utilized vector and graph-aware reranking to index ~300k pages, delivering real-time answers and reducing research time from hours to sub-seconds for chemical formulation scientists.",
+        technologies: ["Hybrid RAG", "Azure Doc Intel", "React", "Graph DB"],
+        githubLink: "https://github.com/LakshyaChaudhry",
+        color: "from-orange-500 to-red-600",
     },
-    {
-        id: 'res-2',
-        title: "Belief Graph State Management",
-        category: 'research',
-        role: "Theory of Mind Research",
-        period: "Nov 2025 – Present",
-        shortDescription: "Developing explicit belief graph architecture for LLM trading agents.",
-        fullDescription: "Developing explicit belief graph architecture for LLM trading agents in adversarial multi-agent market simulations (BSE/ABIDES); implementing JSON-RPC interfaces for real-time belief updates and utility inference. [Mentor: Yuqi Sun]",
-        technologies: ["LLM Agents", "Multi-Agent Sim", "Graph Theory"],
-        githubLink: "https://github.com/tqmsh/hanabi-belief-graph/tree/belief_graph_variants",
-        color: "from-pink-500 to-rose-600",
-        hidden: true,
-    },
+    // Row 4: Portfolio
     {
         id: 'proj-1',
         title: "Portfolio",
@@ -140,15 +154,5 @@ export const projects: Project[] = [
         technologies: ["React", "TypeScript", "Tailwind CSS", "Framer Motion"],
         githubLink: "https://github.com/LakshyaChaudhry/personal-portfolio",
         color: "from-green-500 to-emerald-600",
-    },
-    {
-        id: 'proj-2',
-        title: "Corteva SDS & Label Extractor LLM",
-        category: 'project',
-        shortDescription: "Contracted by Corteva Agriscience to engineer a proprietary hybrid RAG system (Vector + Graph) for crop-protection data, improving research efficiency by ~80%.",
-        fullDescription: "Contracted by Corteva Agriscience to engineer a proprietary PDF extraction and hybrid RAG system for crop-protection Labels and Safety Data Sheets. The system utilized vector and graph-aware reranking to index ~300k pages, delivering real-time answers and reducing research time from hours to sub-seconds for chemical formulation scientists.",
-        technologies: ["Hybrid RAG", "Azure Doc Intel", "React", "Graph DB"],
-        githubLink: "https://github.com/LakshyaChaudhry",
-        color: "from-orange-500 to-red-600",
     },
 ];
