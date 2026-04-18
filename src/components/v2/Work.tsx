@@ -145,6 +145,25 @@ export default function Work() {
                             2026
                         </div>
                         <div className="md:col-span-9">
+                            <h3 className="text-2xl font-bold text-neutral-900 dark:text-white mb-1">Y Combinator</h3>
+                            <div className="text-neutral-500 dark:text-neutral-400 font-medium">Startup School SF 2026</div>
+                            <div className="flex flex-wrap gap-2 mt-2">
+                                <span className="text-xs font-mono text-neutral-500 border border-neutral-200 dark:border-white/10 px-2 py-1 rounded-full">Program</span>
+                            </div>
+                        </div>
+                    </motion.div>
+
+                    <motion.div
+                        initial={{ opacity: 0, x: -20 }}
+                        whileInView={{ opacity: 1, x: 0 }}
+                        viewport={{ once: true }}
+                        transition={{ delay: 0.2 }}
+                        className="grid grid-cols-1 md:grid-cols-12 gap-8 border-l border-neutral-200 dark:border-white/10 pl-8 ml-4 md:ml-0"
+                    >
+                        <div className="md:col-span-3 text-neutral-500 font-mono text-sm pt-1">
+                            2026
+                        </div>
+                        <div className="md:col-span-9">
                             <h3 className="text-2xl font-bold text-neutral-900 dark:text-white mb-1">Blue Dot Impact</h3>
                             <div className="text-neutral-500 dark:text-neutral-400 font-medium">Technical AI Safety Course</div>
                             <div className="flex flex-wrap gap-2 mt-2">
@@ -157,7 +176,7 @@ export default function Work() {
                         initial={{ opacity: 0, x: -20 }}
                         whileInView={{ opacity: 1, x: 0 }}
                         viewport={{ once: true }}
-                        transition={{ delay: 0.2 }}
+                        transition={{ delay: 0.3 }}
                         className="grid grid-cols-1 md:grid-cols-12 gap-8 border-l border-neutral-200 dark:border-white/10 pl-8 ml-4 md:ml-0"
                     >
                         <div className="md:col-span-3 text-neutral-500 font-mono text-sm pt-1">
