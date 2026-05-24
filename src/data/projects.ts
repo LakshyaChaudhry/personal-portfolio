@@ -12,7 +12,7 @@ export interface Project {
     liveLink?: string;
     imageUrl?: string;
     color: string;
-    status?: 'in progress' | 'COLM 2026 under review';
+    status?: 'in progress' | 'COLM 2026 under review' | 'ICML 2026 TAIGR — accepted' | 'ICML 2026 under review';
     hidden?: boolean;
 };
 
@@ -77,17 +77,30 @@ export const projects: Project[] = [
     // --- Projects & Research ---
     // Row 1: Research
     {
-        id: 'res-1',
-        title: "Alignment Faking Detection",
+        id: 'res-beyond-lie-detection',
+        title: "Beyond Lie Detection: Sample-Level White-Box Auditing of Alignment Faking",
         category: 'research',
         role: "Mechanistic Interpretability Researcher",
         period: "Sep 2025 – Present",
-        shortDescription: "Mechanistic interpretability research on alignment faking in misaligned LoRA-tuned models.",
-        fullDescription: "Conducting mechanistic interpretability research on alignment faking in misaligned LoRA-tuned Llama-3-70B models ('HAL9000', 'Pacifist') using eval-awareness, noise-injection, and novel probing technique experiments. [Algoverse AI (Blue Team) x Redwood Research (Red Team)]",
-        technologies: ["TransformerLens", "Mech Interp", "PyTorch"],
+        shortDescription: "Introduced a per-rollout labeling procedure separating alignment faking from plain lying and situational awareness. Probes trained on controlled synthetic AF data gain +12% AUROC and +15% AUPRC over existing lie-detection baselines.",
+        fullDescription: "Introduced a per-rollout labeling procedure that separates alignment faking (correct output, concealed misalignment) from plain lying and situational awareness across four datasets and four Llama-3-70B model organisms (HAL9000, Pacifist). Showed existing deception probes have mixed transfer to AF, while probes trained on a targeted synthetic Animal Protection AF dataset gain +12% AUROC and +15% AUPRC on average. [Algoverse AI (Blue Team) x Redwood Research (Red Team)]",
+        technologies: ["Mechanistic Interpretability", "Linear Probes", "PyTorch", "TransformerLens"],
         githubLink: "https://github.com/LakshyaChaudhry/bench-af",
         color: "from-purple-500 to-violet-600",
-        status: 'in progress',
+        status: 'ICML 2026 TAIGR — accepted',
+    },
+    {
+        id: 'res-sample-whitebox-af',
+        title: "Sample-Level White-Box Detection of Alignment Faking",
+        category: 'research',
+        role: "Mechanistic Interpretability Researcher",
+        period: "Sep 2025 – Present",
+        shortDescription: "First systematic study of sample-level white-box AF detection. Shows truth probe directions drift substantially across fine-tuning lineage (+0.15–0.40 cosine similarity drop), motivating within-model probing for reliable detection.",
+        fullDescription: "First systematic study posing sample-level white-box alignment faking detection as a distinct problem. Beyond probe training data, we show that truth-relevant probe directions drift substantially across a model's fine-tuning lineage — with cosine similarity gaps of 0.15–0.40 — significantly degrading cross-model transfer and motivating within-model probing. Extends the accepted TAIGR paper with a full section on truth representation geometry drift across four models in a shared Llama-3-70B lineage. [Algoverse AI (Blue Team) x Redwood Research (Red Team)]",
+        technologies: ["Mechanistic Interpretability", "Linear Probes", "PyTorch", "TransformerLens"],
+        githubLink: "https://github.com/LakshyaChaudhry/bench-af",
+        color: "from-indigo-500 to-violet-700",
+        status: 'ICML 2026 under review',
     },
     {
         id: 'res-colm',
