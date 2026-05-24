@@ -21,7 +21,13 @@ export default function Work() {
                         {item.category}
                     </span>
                     {item.status && (
-                        <span className="text-[10px] font-mono tracking-wider text-neutral-400 border border-neutral-300 dark:border-white/20 px-2 py-0.5 rounded-full">
+                        <span className={`text-[10px] font-mono tracking-wider px-2 py-0.5 rounded-full border ${
+                            item.status.includes('accepted')
+                                ? 'text-emerald-600 dark:text-emerald-400 border-emerald-300 dark:border-emerald-600/50 bg-emerald-50 dark:bg-emerald-950/30'
+                                : item.status.includes('under review')
+                                ? 'text-amber-600 dark:text-amber-400 border-amber-300 dark:border-amber-600/50 bg-amber-50 dark:bg-amber-950/30'
+                                : 'text-neutral-400 border-neutral-300 dark:border-white/20'
+                        }`}>
                             {item.status}
                         </span>
                     )}
