@@ -19,6 +19,17 @@ export interface Project {
 export const projects: Project[] = [
     // --- Experience ---
     {
+        id: 'exp-mars',
+        title: "Cambridge AI Safety Hub",
+        category: 'experience',
+        role: "AI Research Fellow, MARS 5.0",
+        period: "Jun 2026 – Present",
+        shortDescription: "Selected as a MARS 5.0 Research Fellow; researching AI control & security under Lindley Lentati, Ph.D.",
+        fullDescription: "Selected as a MARS 5.0 Research Fellow at the Cambridge AI Safety Hub. Working under Lindley Lentati, Ph.D on AI control and security research. Based in Oxford, England.",
+        technologies: ["AI Control", "AI Security", "Alignment"],
+        color: "from-violet-500 to-purple-600",
+    },
+    {
         id: 'exp-0',
         title: "Cisco",
         category: 'experience',
