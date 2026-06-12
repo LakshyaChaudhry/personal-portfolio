@@ -111,7 +111,7 @@ export const projects: Project[] = [
         technologies: ["Mechanistic Interpretability", "Linear Probes", "PyTorch", "TransformerLens"],
         githubLink: "https://github.com/LakshyaChaudhry/bench-af",
         color: "from-indigo-500 to-violet-700",
-        status: 'ICML 2026 under review',
+        status: 'ICML 2026 — accepted',
     },
     {
         id: 'res-colm',
