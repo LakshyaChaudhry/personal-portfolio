@@ -12,7 +12,7 @@ export interface Project {
     liveLink?: string;
     imageUrl?: string;
     color: string;
-    status?: 'in progress' | 'COLM 2026 under review' | 'ICML 2026 TAIGR — accepted' | 'ICML 2026 under review';
+    status?: 'in progress' | 'COLM 2026 under review' | 'ICML 2026 TAIGR — accepted' | 'ICML 2026 — accepted';
     hidden?: boolean;
 };
 
