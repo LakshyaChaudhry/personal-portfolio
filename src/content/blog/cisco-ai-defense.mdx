@@ -20,9 +20,7 @@ I worked on two projects.
 
 The first was a framework for catching that kind of failure, and the evals around it. Treat the execution trace as the thing you actually score, not the final answer. Pair a learned detector that can flag fuzzy "this looks off" behavior with explicit rules you can point to when something fires, then ask whether that combination holds up on labeled traces.
 
-The unfun part was the evaluation loop. Precision, recall, AUC, then the threshold you would actually ship. A high-AUC detector can still be useless at that operating point. Labels have to match how the detector is used, not a corpus of obviously-malicious examples. And before I trusted any of my own numbers, I reproduced a published benchmark on the original data. If you cannot hit the paper's number, your pipeline is lying to you.
-
-A lot of the day-to-day was turning a fuzzy policy ("the agent should not do this kind of thing") into a check a machine can fail, then measuring whether it does.
+The bigger gap was evaluating these systems. Building a robust eval that is representative of the agentic threat landscape today, and easy to extend so it stays future-proof.
 
 ## Backdoor detection research
 
@@ -30,8 +28,8 @@ The second was a research project from scratch: detecting backdoors in language 
 
 The public version of the problem is simple. A trigger maps to an attacker-chosen behavior. The trigger can live in training data, in weights, or just in context. Detection splits into two philosophies that the literature already argues about: scan the artifact offline, or probe the model while it is running. They catch different things, and they fail in different ways.
 
-I started from that literature, built a threat picture, and worked on detection from there. Early, ground-up. Less "here is the system" and more "what would you even measure?"
+I started from that literature, built a threat picture, and contributed a research foundation from there.
 
-What I am taking with me is less a method than a habit. Reproduce someone else's number before you trust your own setup. Calibrate labels to how the detector is actually used. Write it down so the next person can run it.
+Thank you to the team for an amazing opportunity and a genuine learning experience this summer.
 
 Lakshya C.
