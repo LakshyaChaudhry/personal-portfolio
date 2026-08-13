@@ -16,10 +16,22 @@ The problem that kept coming up: agents don't fail in a single sentence. They ca
 
 I worked on two projects.
 
-The first was an architecture for catching that kind of failure, and evaluating whether it actually does. Traces in, a detector, metrics out. I am not going to describe the system. The work was: here is the problem, here is a way to look at it, does it hold up.
+## Agentic security framework
 
-The second was a research project from scratch, in the same broader space. Early, ground-up. Same constraint as the first: I can say I did it, not how.
+The first was a framework for catching that kind of failure, and the evals around it. Treat the execution trace as the thing you actually score, not the final answer. Pair a learned detector that can flag fuzzy "this looks off" behavior with explicit rules you can point to when something fires, then ask whether that combination holds up on labeled traces.
 
-Most of what I am taking with me is not a method. It is the habit of turning a fuzzy "the agent should not do this" into something you can measure.
+The unfun part was the evaluation loop. Precision, recall, AUC, then the threshold you would actually ship. A high-AUC detector can still be useless at that operating point. Labels have to match how the detector is used, not a corpus of obviously-malicious examples. And before I trusted any of my own numbers, I reproduced a published benchmark on the original data. If you cannot hit the paper's number, your pipeline is lying to you.
+
+A lot of the day-to-day was turning a fuzzy policy ("the agent should not do this kind of thing") into a check a machine can fail, then measuring whether it does.
+
+## Backdoor detection research
+
+The second was a research project from scratch: detecting backdoors in language models.
+
+The public version of the problem is simple. A trigger maps to an attacker-chosen behavior. The trigger can live in training data, in weights, or just in context. Detection splits into two philosophies that the literature already argues about: scan the artifact offline, or probe the model while it is running. They catch different things, and they fail in different ways.
+
+I started from that literature, built a threat picture, and worked on detection from there. Early, ground-up. Less "here is the system" and more "what would you even measure?"
+
+What I am taking with me is less a method than a habit. Reproduce someone else's number before you trust your own setup. Calibrate labels to how the detector is actually used. Write it down so the next person can run it.
 
 Lakshya C.
