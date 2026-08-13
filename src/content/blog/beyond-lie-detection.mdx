@@ -1,7 +1,7 @@
 ---
 title: "Beyond Lie Detection: Alignment Faking Is Not Just Lying"
 date: "2026-08-13"
-description: "Two ICML 2026 workshop papers on sample-level white-box detection of alignment faking. Lie detectors are not AF detectors, and the probes you train don't transfer across fine-tunes of the same model."
+description: "A dive into my two ICML 2026 workshop papers."
 tags: ["interpretability", "alignment", "ICML", "probes"]
 published: true
 ---
@@ -9,26 +9,24 @@ published: true
 <img src="/assets/blog/icml-seoul.jpg" alt="Presenting at ICML 2026 in Seoul" style={{width: '100%', borderRadius: '0.5rem', marginBottom: '1.5rem'}} />
 
 <div style={{display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '1rem', marginBottom: '2rem'}}>
-  <a href="https://openreview.net/pdf?id=ZqavrFZsZm" target="_blank" rel="noopener noreferrer" style={{textDecoration: 'none', color: 'inherit'}}>
-    <img src="/assets/blog/paper-taigr-preview.png" alt="Beyond Lie Detection camera-ready PDF" style={{width: '100%', borderRadius: '0.5rem', border: '1px solid rgba(128,128,128,0.25)', margin: 0}} />
+  <a href="/assets/blog/chaudhry-2026-taigr.pdf" target="_blank" rel="noopener noreferrer" style={{textDecoration: 'none', color: 'inherit', cursor: 'pointer', display: 'block'}}>
+    <img src="/assets/blog/paper-taigr-preview.png" alt="Beyond Lie Detection PDF" style={{width: '100%', borderRadius: '0.5rem', border: '1px solid rgba(128,128,128,0.25)', margin: 0}} />
     <div style={{marginTop: '0.5rem', fontSize: '0.7rem', letterSpacing: '0.12em', textTransform: 'uppercase', opacity: 0.55, fontFamily: 'ui-monospace, SFMono-Regular, Menlo, monospace'}}>TAIGR workshop · PDF</div>
   </a>
-  <a href="/assets/blog/chaudhry-2026-mech-interp.pdf" target="_blank" rel="noopener noreferrer" style={{textDecoration: 'none', color: 'inherit'}}>
-    <img src="/assets/blog/paper-mech-interp-preview.png" alt="Sample-Level White-Box Detection camera-ready PDF" style={{width: '100%', borderRadius: '0.5rem', border: '1px solid rgba(128,128,128,0.25)', margin: 0}} />
+  <a href="/assets/blog/chaudhry-2026-mech-interp.pdf" target="_blank" rel="noopener noreferrer" style={{textDecoration: 'none', color: 'inherit', cursor: 'pointer', display: 'block'}}>
+    <img src="/assets/blog/paper-mech-interp-preview.png" alt="Sample-Level White-Box Detection PDF" style={{width: '100%', borderRadius: '0.5rem', border: '1px solid rgba(128,128,128,0.25)', margin: 0}} />
     <div style={{marginTop: '0.5rem', fontSize: '0.7rem', letterSpacing: '0.12em', textTransform: 'uppercase', opacity: 0.55, fontFamily: 'ui-monospace, SFMono-Regular, Menlo, monospace'}}>Mech Interp workshop · PDF</div>
   </a>
 </div>
 
-I spent part of this summer in Seoul presenting two papers that started as a stubborn labeling problem: if a model gives the right answer for the wrong reason, most evaluations call that a pass.
+I had the chance to present two of our papers at the ICML 2026 workshops in Seoul. A good week. Below is a deeper dive into the work.
 
-This is the long writeup of the two papers. A LessWrong version is going up alongside it. The papers are:
+The papers are:
 
 - *Beyond Lie Detection: Sample-Level White-Box Auditing of Alignment Faking* — ICML 2026 Technical AI Governance Research (TAIGR) workshop
 - *Sample-Level White-Box Detection of Alignment Faking* — ICML 2026 Mechanistic Interpretability workshop
 
-Equal contribution with Tianqin Meng, Anthony Nguyen, and Yashraj Panwar. Also on the papers: Yuqi Sun and Zhuofan (Josh) Ying.
-
-The rest of this post is the research, not the trip.
+Equal contribution with Tianqin Meng, Anthony Nguyen, and Yashraj Panwar. A big thank you to my mentors, Yuqi Sun and Zhuofan (Josh) Ying.
 
 ---
 

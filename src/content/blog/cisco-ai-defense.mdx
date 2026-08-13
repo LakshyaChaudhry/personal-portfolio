@@ -1,57 +1,25 @@
 ---
-title: "Traces, Not Outputs: A Summer on Cisco's AI Defense Team"
+title: "A Recap of My Summer on Cisco's AI Defense Team"
 date: "2026-08-13"
-description: "Three months in San Jose on Cisco's AI Defense team. Public version: agentic AI security, why traces matter more than final answers, and what I learned about evaluating detectors."
+description: "2026 Cisco AI/MLE internship recap"
 tags: ["cisco", "ai-security", "agents", "internship"]
 published: true
 ---
 
 <img src="/assets/blog/cisco-interns.jpg" alt="Intern cohort, San Francisco" style={{width: '100%', borderRadius: '0.5rem', marginBottom: '1.5rem'}} />
 
-I spent the summer in San Jose on Cisco's AI Defense team, working on agentic AI security.
+I spent the summer in San Jose on Cisco's AI Defense team.
 
-That sentence is the resume version. The actual problem, at a level I can talk about, is simpler: an agent can look fine at the last token and still have gone off the rails three tool calls ago. If you only score the final answer, you miss it.
-
-This is the public version. No internal systems, no product names, no architecture. The useful part is the industry-standard stuff: how you think about bad agent behavior when the failure is a sequence, not a single string.
-
+The problem that kept coming up: agents don't fail in a single sentence. They call tools, write memory, talk to other agents, and only later produce something that looks fine. If you only look at the last message, you miss the part that actually went wrong.
 
 <img src="/assets/blog/cisco-office.jpg" alt="Interns in a working session" style={{width: '100%', borderRadius: '0.5rem', margin: '1.5rem 0 2rem'}} />
 
-## Agents fail over time
+I worked on two projects.
 
-Most public LLM security still looks like output scanning. The model says something. You classify the something. If it is bad, you block it.
+The first was an architecture for catching that kind of failure, and evaluating whether it actually does. Traces in, a detector, metrics out. I am not going to describe the system. The work was: here is the problem, here is a way to look at it, does it hold up.
 
-Agents break that. They call tools, write memory, talk to other agents, and only later produce a user-visible answer. A compromise can live in the trace. The final message can still read like a helpful assistant.
+The second was a research project from scratch, in the same broader space. Early, ground-up. Same constraint as the first: I can say I did it, not how.
 
-So the question is not only "is this sentence unsafe?" It is "does this trajectory violate something we actually care about?"
-
-That is a different object. You need labels on traces, not just on completions. You need a way to talk about order. And you need a detector that is allowed to be wrong in a way you can explain, because nobody ships a black-box blocker into an enterprise product and hopes.
-
-I am not going to describe how we built that. The public takeaway is the unit of analysis: for agents, the trace is the thing you evaluate.
-
-## Evaluation is the whole job
-
-I got pretty obsessive about the evaluation loop: labeled examples, a detector, metrics, then the unfun part where you pick a threshold and watch precision fall off a cliff.
-
-Things that sound basic and were not:
-
-- Reproducing a published benchmark number *before* you trust your own setup. If you cannot hit the paper's number on their data, your pipeline is lying to you. I have been burned by this in research already (artifact scores that look perfect until you fix the prompt formatting). Same lesson, different building.
-- Calibration. The labels have to match how the detector is actually used. A corpus of obviously-malicious traces trains a detector that is bored by real traffic.
-- The operating point. A high-AUC model can still be useless at the threshold you ship. Security teams live there, not on the ROC curve.
-
-The useful intern skill was turning a fuzzy requirement ("the agent should not do this kind of thing") into something a machine can fail, then measuring whether it actually does.
-
-## What I am taking with me
-
-A few things survived contact with a real team:
-
-- Trace-level monitoring is the right unit for agents. Output-only scanners are a floor, not a ceiling.
-- AUC is a research metric. The threshold is a product decision.
-- Reproducing someone else's number is how you debug your own pipeline.
-- The work is not done until someone else can run it. Feature branches, stacked PRs, code review, a handoff doc. Unsexy. Required.
-
-The through-line with the ICML papers is not a coincidence. Those papers argue that you cannot detect alignment faking by looking at the final answer, because the final answer is often correct. The internship was the enterprise version of the same instinct: the failure is in the sequence, not the last string the user sees.
-
-I cannot say much more than that, which is the point. If you want methods, wait for whatever the team publishes. If you want the shape of the problem, it is this: agents fail over time, and detectors that cannot see time are going to miss them.
+Most of what I am taking with me is not a method. It is the habit of turning a fuzzy "the agent should not do this" into something you can measure.
 
 Lakshya C.
