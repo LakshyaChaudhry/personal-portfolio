@@ -12,18 +12,40 @@ export interface Project {
     liveLink?: string;
     imageUrl?: string;
     color: string;
-    status?: 'in progress';
+    status?: 'in progress' | 'COLM 2026 under review' | 'ICML 2026 TAIGR — accepted' | 'ICML 2026 — accepted';
     hidden?: boolean;
 };
 
 export const projects: Project[] = [
     // --- Experience ---
     {
+        id: 'exp-mars',
+        title: "Cambridge AI Safety Hub",
+        category: 'experience',
+        role: "AI Research Fellow, MARS 5.0",
+        period: "Jun 2026 – Present",
+        shortDescription: "Selected as a MARS 5.0 Research Fellow; researching AI control & security under Lindley Lentati, Ph.D.",
+        fullDescription: "Selected as a MARS 5.0 Research Fellow at the Cambridge AI Safety Hub. Working under Lindley Lentati, Ph.D on AI control and security research. Based in Oxford, England.",
+        technologies: ["AI Control", "AI Security", "Alignment"],
+        color: "from-violet-500 to-purple-600",
+    },
+    {
+        id: 'exp-0',
+        title: "Cisco",
+        category: 'experience',
+        role: "AI/ML Engineering Intern",
+        period: "Summer 2026",
+        shortDescription: "Incoming AI/ML Engineering Intern.",
+        fullDescription: "Incoming AI/ML Engineering Intern at Cisco.",
+        technologies: ["AI/ML"],
+        color: "from-blue-600 to-cyan-500",
+    },
+    {
         id: 'exp-1',
         title: "TrustCircle",
         category: 'experience',
         role: "AI/ML Research Intern",
-        period: "May 2025 – Present",
+        period: "May 2025 – Aug 2025",
         shortDescription: "Built production-ready RAG for emotional-support retrieval.",
         fullDescription: "Built a production-ready RAG for emotional-support retrieval (AI-powered recommendation system that matches students with mental health resources) using OpenAI embeddings + MongoDB Atlas vector search.",
         technologies: ["OpenAI", "MongoDB Atlas", "RAG", "Vector Search"],
@@ -64,6 +86,47 @@ export const projects: Project[] = [
     },
 
     // --- Projects & Research ---
+    // Row 1: Research
+    {
+        id: 'res-beyond-lie-detection',
+        title: "Beyond Lie Detection: Sample-Level White-Box Auditing of Alignment Faking",
+        category: 'research',
+        role: "Mechanistic Interpretability Researcher",
+        period: "Sep 2025 – Present",
+        shortDescription: "Introduced a per-rollout labeling procedure separating alignment faking from plain lying and situational awareness. Probes trained on controlled synthetic AF data gain +12% AUROC and +15% AUPRC over existing lie-detection baselines.",
+        fullDescription: "Introduced a per-rollout labeling procedure that separates alignment faking (correct output, concealed misalignment) from plain lying and situational awareness across four datasets and four Llama-3-70B model organisms (HAL9000, Pacifist). Showed existing deception probes have mixed transfer to AF, while probes trained on a targeted synthetic Animal Protection AF dataset gain +12% AUROC and +15% AUPRC on average. [Algoverse AI (Blue Team) x Redwood Research (Red Team)]",
+        technologies: ["Mechanistic Interpretability", "Linear Probes", "PyTorch", "TransformerLens"],
+        githubLink: "https://github.com/LakshyaChaudhry/bench-af",
+        color: "from-purple-500 to-violet-600",
+        status: 'ICML 2026 TAIGR — accepted',
+    },
+    {
+        id: 'res-sample-whitebox-af',
+        title: "Sample-Level White-Box Detection of Alignment Faking",
+        category: 'research',
+        role: "Mechanistic Interpretability Researcher",
+        period: "Sep 2025 – Present",
+        shortDescription: "First systematic study of sample-level white-box AF detection. Shows truth probe directions drift substantially across fine-tuning lineage (+0.15–0.40 cosine similarity drop), motivating within-model probing for reliable detection.",
+        fullDescription: "First systematic study posing sample-level white-box alignment faking detection as a distinct problem. Beyond probe training data, we show that truth-relevant probe directions drift substantially across a model's fine-tuning lineage — with cosine similarity gaps of 0.15–0.40 — significantly degrading cross-model transfer and motivating within-model probing. Extends the accepted TAIGR paper with a full section on truth representation geometry drift across four models in a shared Llama-3-70B lineage. [Algoverse AI (Blue Team) x Redwood Research (Red Team)]",
+        technologies: ["Mechanistic Interpretability", "Linear Probes", "PyTorch", "TransformerLens"],
+        githubLink: "https://github.com/LakshyaChaudhry/bench-af",
+        color: "from-indigo-500 to-violet-700",
+        status: 'ICML 2026 — accepted',
+    },
+    {
+        id: 'res-colm',
+        title: "Don't Make the LLM Read the Graph — Make the Graph Think",
+        category: 'research',
+        role: "Multi-Agent Cooperation Research",
+        period: "Nov 2025 – Present",
+        shortDescription: "Investigating whether belief graphs improve LLM cooperation in Hanabi across 3,000+ trials and four model families. Identified \"Planner Defiance\" — a novel failure mode where LLMs override correct graph recommendations. Under review at COLM 2026.",
+        fullDescription: "Investigating whether belief graphs improve LLM cooperation in Hanabi across 3,000+ trials and four model families. Identified \"Planner Defiance\" — a novel failure mode where LLMs override correct graph recommendations. Under review at COLM 2026.",
+        technologies: ["Multi-Agent", "Hanabi", "Belief Graphs", "LLM Reasoning"],
+        paperLink: "https://openreview.net/forum?id=y3TtQFiodt",
+        color: "from-pink-500 to-rose-600",
+        status: 'COLM 2026 under review',
+    },
+    // Row 2: Distill + SynthBench
     {
         id: 'proj-distill',
         title: "Distill",
@@ -84,6 +147,7 @@ export const projects: Project[] = [
         liveLink: "/blog/synthbench",
         color: "from-neutral-500 to-neutral-700",
     },
+    // Row 3: Signal + Corteva
     {
         id: 'proj-signal',
         title: "Signal",
@@ -95,31 +159,16 @@ export const projects: Project[] = [
         color: "from-neutral-500 to-neutral-700",
     },
     {
-        id: 'res-1',
-        title: "Alignment Faking Detection",
-        category: 'research',
-        role: "Mechanistic Interpretability Researcher",
-        period: "Sep 2025 – Present",
-        shortDescription: "Mechanistic interpretability research on alignment faking in misaligned LoRA-tuned models.",
-        fullDescription: "Conducting mechanistic interpretability research on alignment faking in misaligned LoRA-tuned Llama-3-70B models ('HAL9000', 'Pacifist') using eval-awareness, noise-injection, and novel probing technique experiments. [Algoverse AI (Blue Team) x Redwood Research (Red Team)]",
-        technologies: ["TransformerLens", "Mech Interp", "PyTorch"],
-        githubLink: "https://github.com/LakshyaChaudhry/bench-af",
-        color: "from-purple-500 to-violet-600",
-        status: 'in progress',
+        id: 'proj-2',
+        title: "Corteva SDS & Label Extractor LLM",
+        category: 'project',
+        shortDescription: "Contracted by Corteva Agriscience to engineer a proprietary hybrid RAG system (Vector + Graph) for crop-protection data, improving research efficiency by ~80%.",
+        fullDescription: "Contracted by Corteva Agriscience to engineer a proprietary PDF extraction and hybrid RAG system for crop-protection Labels and Safety Data Sheets. The system utilized vector and graph-aware reranking to index ~300k pages, delivering real-time answers and reducing research time from hours to sub-seconds for chemical formulation scientists.",
+        technologies: ["Hybrid RAG", "Azure Doc Intel", "React", "Graph DB"],
+        githubLink: "https://github.com/LakshyaChaudhry",
+        color: "from-orange-500 to-red-600",
     },
-    {
-        id: 'res-2',
-        title: "Belief Graph State Management",
-        category: 'research',
-        role: "Theory of Mind Research",
-        period: "Nov 2025 – Present",
-        shortDescription: "Developing explicit belief graph architecture for LLM trading agents.",
-        fullDescription: "Developing explicit belief graph architecture for LLM trading agents in adversarial multi-agent market simulations (BSE/ABIDES); implementing JSON-RPC interfaces for real-time belief updates and utility inference. [Mentor: Yuqi Sun]",
-        technologies: ["LLM Agents", "Multi-Agent Sim", "Graph Theory"],
-        githubLink: "https://github.com/tqmsh/hanabi-belief-graph/tree/belief_graph_variants",
-        color: "from-pink-500 to-rose-600",
-        hidden: true,
-    },
+    // Row 4: Portfolio
     {
         id: 'proj-1',
         title: "Portfolio",
@@ -129,15 +178,5 @@ export const projects: Project[] = [
         technologies: ["React", "TypeScript", "Tailwind CSS", "Framer Motion"],
         githubLink: "https://github.com/LakshyaChaudhry/personal-portfolio",
         color: "from-green-500 to-emerald-600",
-    },
-    {
-        id: 'proj-2',
-        title: "Corteva SDS & Label Extractor LLM",
-        category: 'project',
-        shortDescription: "Contracted by Corteva Agriscience to engineer a proprietary hybrid RAG system (Vector + Graph) for crop-protection data, improving research efficiency by ~80%.",
-        fullDescription: "Contracted by Corteva Agriscience to engineer a proprietary PDF extraction and hybrid RAG system for crop-protection Labels and Safety Data Sheets. The system utilized vector and graph-aware reranking to index ~300k pages, delivering real-time answers and reducing research time from hours to sub-seconds for chemical formulation scientists.",
-        technologies: ["Hybrid RAG", "Azure Doc Intel", "React", "Graph DB"],
-        githubLink: "https://github.com/LakshyaChaudhry",
-        color: "from-orange-500 to-red-600",
     },
 ];
