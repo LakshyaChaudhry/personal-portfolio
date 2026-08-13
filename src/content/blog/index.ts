@@ -3,6 +3,8 @@ import * as helloWorld from './hello-world.mdx'
 import * as signalAiCoach from './signal-ai-coach.mdx'
 import * as synthbench from './synthbench.mdx'
 import * as distill from './distill.mdx'
+import * as beyondLieDetection from './beyond-lie-detection.mdx'
+import * as ciscoAiDefense from './cisco-ai-defense.mdx'
 
 export interface BlogPostMeta {
   slug: string
@@ -23,6 +25,8 @@ const postModules: Record<string, BlogPostModule> = {
   'signal-ai-coach': signalAiCoach as unknown as BlogPostModule,
   'synthbench': synthbench as unknown as BlogPostModule,
   'distill': distill as unknown as BlogPostModule,
+  'beyond-lie-detection': beyondLieDetection as unknown as BlogPostModule,
+  'cisco-ai-defense': ciscoAiDefense as unknown as BlogPostModule,
 }
 
 export function getAllPosts(): BlogPostMeta[] {

@@ -1,0 +1,35 @@
+---
+title: "A Recap of My Summer on Cisco's AI Defense Team"
+date: "2026-08-13"
+description: "2026 Cisco AI/MLE internship recap"
+tags: ["cisco", "ai-security", "agents", "internship"]
+published: true
+---
+
+<img src="/assets/blog/cisco-interns.jpg" alt="Intern cohort, San Francisco" style={{width: '100%', borderRadius: '0.5rem', marginBottom: '1.5rem'}} />
+
+I spent the summer in San Jose on Cisco's AI Defense team.
+
+The problem that kept coming up: agents don't fail in a single sentence. They call tools, write memory, talk to other agents, and only later produce something that looks fine. If you only look at the last message, you miss the part that actually went wrong.
+
+<img src="/assets/blog/cisco-office.jpg" alt="Interns in a working session" style={{width: '100%', borderRadius: '0.5rem', margin: '1.5rem 0 2rem'}} />
+
+I worked on two projects.
+
+## Agentic security framework
+
+The first was a framework for catching that kind of failure, and the evals around it. Treat the execution trace as the thing you actually score, not the final answer. Pair a learned detector that can flag fuzzy "this looks off" behavior with explicit rules you can point to when something fires, then ask whether that combination holds up on labeled traces.
+
+The bigger gap was evaluating these systems. Building a robust eval that is representative of the agentic threat landscape today, and easy to extend so it stays future-proof.
+
+## Backdoor detection research
+
+The second was a research project from scratch: detecting backdoors in language models.
+
+The public version of the problem is simple. A trigger maps to an attacker-chosen behavior. The trigger can live in training data, in weights, or just in context. Detection splits into two philosophies that the literature already argues about: scan the artifact offline, or probe the model while it is running. They catch different things, and they fail in different ways.
+
+I started from that literature, built a threat picture, and contributed a research foundation from there.
+
+Thank you to the team for an amazing opportunity and a genuine learning experience this summer.
+
+Lakshya C.
