@@ -1,80 +1,149 @@
 import { motion } from 'framer-motion';
 import { Link } from 'react-router-dom';
-import { projects } from '../../data/projects';
-import { Github, ArrowUpRight, FileText } from 'lucide-react';
+import { ArrowUpRight, FileText, Github } from 'lucide-react';
+import { cardFaces, experienceRows } from '../../data/projects';
+import type { CardFace } from '../../data/projects';
 
-export default function Work() {
-    const experience = projects.filter(p => p.category === 'experience');
-    const projectItems = projects.filter(p => (p.category === 'project' || p.category === 'research') && !p.hidden);
+function TagList({ tags }: { tags: readonly string[] }) {
+    return (
+        <div className="flex flex-wrap gap-2">
+            {tags.map((tag) => (
+                <span
+                    key={tag}
+                    className="text-xs font-mono text-neutral-500 border border-neutral-200 dark:border-white/10 px-2 py-1 rounded-full"
+                >
+                    {tag}
+                </span>
+            ))}
+        </div>
+    );
+}
 
-    const Card = ({ item, index }: { item: typeof projects[0], index: number }) => (
-        <motion.div
+function destinationAriaLabel(label: string, title: string, external: boolean): string {
+    const name = `${label}: ${title}`;
+    return external ? `${name} (opens in a new tab)` : name;
+}
+
+function DestinationIcon({ label }: { label: CardFace['activation']['label'] }) {
+    switch (label) {
+        case 'Writeup':
+            return <ArrowUpRight size={14} aria-hidden="true" className="shrink-0" />;
+        case 'Paper':
+            return <FileText size={14} aria-hidden="true" className="shrink-0" />;
+        case 'Code':
+            return <Github size={14} aria-hidden="true" className="shrink-0" />;
+        default: {
+            const unexpected: never = label;
+            return unexpected;
+        }
+    }
+}
+
+const activationClass =
+    "after:absolute after:inset-0 after:content-[''] rounded-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-neutral-900 dark:focus-visible:outline-white";
+
+function Activation({ face }: { face: CardFace }) {
+    const { activation, title } = face;
+    const ariaLabel = destinationAriaLabel(activation.label, title, activation.external);
+    if (activation.external) {
+        return (
+            <a
+                href={activation.href}
+                target="_blank"
+                rel="noopener noreferrer"
+                className={activationClass}
+                aria-label={ariaLabel}
+            >
+                {title}
+            </a>
+        );
+    }
+    return (
+        <Link to={activation.href} className={activationClass} aria-label={ariaLabel}>
+            {title}
+        </Link>
+    );
+}
+
+function ActionLink({ link, title }: { link: CardFace['links'][number]; title: string }) {
+    const className = [
+        'min-h-11 px-3 inline-flex items-center gap-1.5 pointer-events-auto relative z-10',
+        'text-[10px] uppercase tracking-widest font-mono border',
+        'border-neutral-200 text-neutral-500 hover:text-neutral-900 hover:border-neutral-900',
+        'dark:border-white/15 dark:text-neutral-400 dark:hover:text-white dark:hover:border-white',
+    ].join(' ');
+    return (
+        <a
+            href={link.href}
+            target="_blank"
+            rel="noopener noreferrer"
+            className={className}
+            aria-label={destinationAriaLabel(link.label, title, link.external)}
+        >
+            <DestinationIcon label={link.label} />
+            {link.label}
+        </a>
+    );
+}
+
+const toneClass = {
+    accepted:
+        'text-emerald-600 dark:text-emerald-400 border-emerald-300 dark:border-emerald-600/50 bg-emerald-50 dark:bg-emerald-950/30',
+    review:
+        'text-amber-600 dark:text-amber-400 border-amber-300 dark:border-amber-600/50 bg-amber-50 dark:bg-amber-950/30',
+    sky: 'text-sky-700 dark:text-sky-300 border-sky-300 dark:border-sky-600/50 bg-sky-50 dark:bg-sky-950/30',
+    neutral: 'text-neutral-400 border-neutral-300 dark:border-white/20',
+} as const;
+
+function ProjectCard({ face, index }: { face: CardFace; index: number }) {
+    return (
+        <motion.article
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true, margin: "-50px" }}
+            viewport={{ once: true, margin: '-50px' }}
             transition={{ duration: 0.5, delay: index * 0.1 }}
-            className="group relative flex flex-col h-full bg-neutral-50 dark:bg-neutral-900/20 border border-neutral-200 dark:border-white/5 p-8 transition-all duration-500 rounded-sm hover:-translate-y-1 hover:shadow-lg dark:hover:shadow-white/5 ring-1 ring-transparent hover:ring-black dark:hover:ring-white"
+            className="group relative min-w-0 h-full flex flex-col bg-neutral-50 dark:bg-neutral-900/20 border border-neutral-200 dark:border-white/5 p-5 sm:p-8 rounded-sm transition-all duration-500 ring-1 ring-transparent hover:ring-black dark:hover:ring-white focus-within:ring-black dark:focus-within:ring-white md:hover:-translate-y-1 md:hover:shadow-lg dark:md:hover:shadow-white/5"
         >
-            <div className="flex justify-between items-start mb-6">
-                <div className="flex items-center gap-2">
-                    <span className="text-neutral-500 font-mono text-xs tracking-widest uppercase">
-                        {item.category}
+            <div className="flex flex-wrap items-center gap-x-2 gap-y-2 mb-5">
+                <span className="text-neutral-500 font-mono text-xs tracking-widest uppercase">
+                    {face.eyebrow}
+                </span>
+                {face.status && (
+                    <span className={`text-[10px] font-mono tracking-wider px-2 py-0.5 rounded-full border max-w-full ${toneClass[face.status.tone]}`}>
+                        {face.status.label}
                     </span>
-                    {item.status && (
-                        <span className={`text-[10px] font-mono tracking-wider px-2 py-0.5 rounded-full border ${
-                            item.status.includes('accepted')
-                                ? 'text-emerald-600 dark:text-emerald-400 border-emerald-300 dark:border-emerald-600/50 bg-emerald-50 dark:bg-emerald-950/30'
-                                : item.status.includes('under review')
-                                ? 'text-amber-600 dark:text-amber-400 border-amber-300 dark:border-amber-600/50 bg-amber-50 dark:bg-amber-950/30'
-                                : 'text-neutral-400 border-neutral-300 dark:border-white/20'
-                        }`}>
-                            {item.status}
-                        </span>
-                    )}
-                </div>
-                <div className="flex gap-3">
-                    {item.githubLink && (
-                        <a href={item.githubLink} target="_blank" rel="noopener noreferrer" className="text-neutral-400 hover:text-black dark:hover:text-white transition-colors">
-                            <Github size={18} />
-                        </a>
-                    )}
-                    {item.liveLink && (
-                        item.liveLink.startsWith('/') ? (
-                            <Link to={item.liveLink} className="text-neutral-400 hover:text-black dark:hover:text-white transition-colors">
-                                <ArrowUpRight size={18} />
-                            </Link>
-                        ) : (
-                            <a href={item.liveLink} target="_blank" rel="noopener noreferrer" className="text-neutral-400 hover:text-black dark:hover:text-white transition-colors">
-                                <ArrowUpRight size={18} />
-                            </a>
-                        )
-                    )}
-                    {item.paperLink && (
-                        <a href={item.paperLink} target="_blank" rel="noopener noreferrer" className="text-neutral-400 hover:text-black dark:hover:text-white transition-colors">
-                            <FileText size={18} />
-                        </a>
-                    )}
-                </div>
+                )}
             </div>
 
-            <h3 className="text-xl font-bold mb-3 text-neutral-900 dark:text-neutral-100 group-hover:text-black dark:group-hover:text-white transition-colors">
-                {item.title}
+            <h3 className="text-lg sm:text-xl font-bold mb-3 leading-snug break-words text-neutral-900 dark:text-neutral-100 group-hover:text-black dark:group-hover:text-white transition-colors">
+                <Activation face={face} />
             </h3>
 
-            <p className="text-sm text-neutral-600 dark:text-neutral-400 mb-6 font-light leading-relaxed flex-grow">
-                {item.shortDescription}
+            <p className="pointer-events-none text-sm text-neutral-600 dark:text-neutral-400 mb-6 font-light leading-relaxed flex-grow">
+                {face.summary}
             </p>
 
-            <div className="flex flex-wrap gap-2 mt-auto pt-4 border-t border-neutral-200 dark:border-white/5">
-                {item.technologies.slice(0, 4).map(tech => (
-                    <span key={tech} className="text-[10px] uppercase tracking-wider font-mono text-neutral-500">
-                        {tech}
-                    </span>
+            <div className="relative z-10 flex flex-wrap gap-2 mb-5 pointer-events-none">
+                <span
+                    aria-hidden="true"
+                    className="pointer-events-none min-h-11 px-3 inline-flex items-center gap-1.5 text-[10px] uppercase tracking-widest font-mono border border-neutral-900 text-neutral-900 dark:border-white dark:text-white"
+                >
+                    <DestinationIcon label={face.activation.label} />
+                    {face.activation.label}
+                </span>
+                {face.links.map((link) => (
+                    <ActionLink key={link.label} link={link} title={face.title} />
                 ))}
             </div>
-        </motion.div>
-    );
 
+            <div className="pointer-events-none">
+                <TagList tags={face.tags} />
+            </div>
+        </motion.article>
+    );
+}
+
+export default function Work() {
     return (
         <section id="work" className="py-32">
             {/* Experience (Timeline) */}
@@ -86,9 +155,9 @@ export default function Work() {
                 </div>
 
                 <div className="space-y-12">
-                    {experience.map((item, index) => (
+                    {experienceRows.map((row, index) => (
                         <motion.div
-                            key={item.id}
+                            key={row.id}
                             initial={{ opacity: 0, x: -20 }}
                             whileInView={{ opacity: 1, x: 0 }}
                             viewport={{ once: true }}
@@ -96,17 +165,12 @@ export default function Work() {
                             className="grid grid-cols-1 md:grid-cols-12 gap-8 border-l border-neutral-200 dark:border-white/10 pl-8 ml-4 md:ml-0"
                         >
                             <div className="md:col-span-3 text-neutral-500 font-mono text-sm pt-1">
-                                {item.period}
+                                {row.period}
                             </div>
                             <div className="md:col-span-9">
-                                <h3 className="text-2xl font-bold text-neutral-900 dark:text-white mb-1">{item.title}</h3>
-                                <div className="text-neutral-500 dark:text-neutral-400 mb-4 font-medium">{item.role}</div>
-                                {/* Description removed per request */}
-                                <div className="flex flex-wrap gap-2 mt-2">
-                                    {item.technologies.map(tech => (
-                                        <span key={tech} className="text-xs font-mono text-neutral-500 border border-neutral-200 dark:border-white/10 px-2 py-1 rounded-full">{tech}</span>
-                                    ))}
-                                </div>
+                                <h3 className="text-2xl font-bold text-neutral-900 dark:text-white mb-1">{row.title}</h3>
+                                <div className="text-neutral-500 dark:text-neutral-400 mb-4 font-medium">{row.role}</div>
+                                <TagList tags={row.tags} />
                             </div>
                         </motion.div>
                     ))}
@@ -122,24 +186,6 @@ export default function Work() {
                 </div>
 
                 <div className="space-y-12">
-                    <motion.div
-                        initial={{ opacity: 0, x: -20 }}
-                        whileInView={{ opacity: 1, x: 0 }}
-                        viewport={{ once: true }}
-                        className="grid grid-cols-1 md:grid-cols-12 gap-8 border-l border-neutral-200 dark:border-white/10 pl-8 ml-4 md:ml-0"
-                    >
-                        <div className="md:col-span-3 text-neutral-500 font-mono text-sm pt-1">
-                            Aug 2024 – May 2028
-                        </div>
-                        <div className="md:col-span-9">
-                            <h3 className="text-2xl font-bold text-neutral-900 dark:text-white mb-1">Purdue University</h3>
-                            <div className="text-neutral-500 dark:text-neutral-400 font-medium">B.S. Artificial Intelligence</div>
-                            <div className="flex flex-wrap gap-2 mt-2">
-                                <span className="text-xs font-mono text-neutral-500 border border-neutral-200 dark:border-white/10 px-2 py-1 rounded-full">Dean's List</span>
-                            </div>
-                        </div>
-                    </motion.div>
-
                     <motion.div
                         initial={{ opacity: 0, x: -20 }}
                         whileInView={{ opacity: 1, x: 0 }}
@@ -207,8 +253,8 @@ export default function Work() {
                     </h2>
                 </div>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    {projectItems.map((project, index) => (
-                        <Card key={project.id} item={project} index={index} />
+                    {cardFaces.map((face, index) => (
+                        <ProjectCard key={face.id} face={face} index={index} />
                     ))}
                 </div>
             </div>
