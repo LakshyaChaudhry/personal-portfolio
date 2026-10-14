@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react';
-import { AnimatePresence, motion, useReducedMotion } from 'framer-motion';
+import { AnimatePresence, motion, useAnimationControls, useReducedMotion } from 'framer-motion';
 import { Link } from 'react-router-dom';
 import { ArrowUpRight, FileText, Github, X } from 'lucide-react';
 import { cardFaces, experienceRows } from '../../data/projects';
@@ -76,20 +76,28 @@ function cardLinks(face: CardFace): readonly CardLink[] {
     return [face.activation, ...face.links];
 }
 
-function menuLabel(link: CardLink): string {
-    if (link.label === 'Writeup') return 'WRITEUP';
-    if (link.label === 'Code') return 'CODE';
-    if (link.href.includes('openreview.net')) return 'OPENREVIEW';
-    return 'PAPER';
+function linkName(link: CardLink): string {
+    if (link.label === 'Writeup') return 'Writeup';
+    if (link.label === 'Code') return 'Code';
+    if (link.href.includes('openreview.net')) return 'OpenReview';
+    return 'Paper';
 }
 
-const menuItemClass =
-    'text-4xl font-bold tracking-tighter text-black dark:text-white hover:opacity-50 transition-opacity';
+function linkHint(link: CardLink): string {
+    if (link.label === 'Writeup') return 'on-site post';
+    if (link.label === 'Code') return 'GitHub';
+    if (link.href.includes('openreview.net')) return 'forum';
+    return 'preprint';
+}
 
 const expandEase = [0.4, 0, 0.2, 1] as const;
 const expandDuration = 0.7;
 
 type CardOrigin = { top: number; left: number; width: number; height: number };
+
+type Flight = { x: number; y: number; scaleX: number; scaleY: number; opacity: number };
+
+const settledFlight: Flight = { x: 0, y: 0, scaleX: 1, scaleY: 1, opacity: 1 };
 
 function readCardOrigin(trigger: HTMLElement): CardOrigin {
     const card = trigger.closest('[data-project-card]');
@@ -97,19 +105,39 @@ function readCardOrigin(trigger: HTMLElement): CardOrigin {
     return { top: rect.top, left: rect.left, width: rect.width, height: rect.height };
 }
 
-function expandedFrame(): CardOrigin {
-    const mobile = window.matchMedia('(max-width: 767px)').matches;
-    if (mobile) {
-        return { top: 0, left: 0, width: window.innerWidth, height: window.innerHeight };
-    }
-    const inset = Math.max(64, Math.round(Math.min(window.innerWidth, window.innerHeight) * 0.08));
+function readLayoutBox(element: HTMLElement): CardOrigin {
+    const style = getComputedStyle(element);
     return {
-        top: inset,
-        left: inset,
-        width: window.innerWidth - inset * 2,
-        height: window.innerHeight - inset * 2,
+        top: Number.parseFloat(style.top) || 0,
+        left: Number.parseFloat(style.left) || 0,
+        width: element.offsetWidth,
+        height: element.offsetHeight,
     };
 }
+
+function flightBetween(origin: CardOrigin, frame: CardOrigin): Flight {
+    const width = frame.width > 0 ? frame.width : 1;
+    const height = frame.height > 0 ? frame.height : 1;
+    return {
+        x: origin.left - frame.left,
+        y: origin.top - frame.top,
+        scaleX: origin.width / width,
+        scaleY: origin.height / height,
+        opacity: 1,
+    };
+}
+
+function sameFlight(a: Flight, b: Flight): boolean {
+    return (
+        Math.abs(a.x - b.x) < 0.5 &&
+        Math.abs(a.y - b.y) < 0.5 &&
+        Math.abs(a.scaleX - b.scaleX) < 0.002 &&
+        Math.abs(a.scaleY - b.scaleY) < 0.002
+    );
+}
+
+const expandedPanelClass =
+    'fixed overflow-y-auto rounded-sm border border-neutral-200 bg-neutral-50 text-neutral-900 shadow-lg dark:border-white/5 dark:bg-neutral-900 dark:text-neutral-100 dark:shadow-white/5 inset-0 h-dvh w-full md:inset-auto md:top-6 md:right-auto md:bottom-auto md:left-[max(1rem,calc((100vw-min(52rem,100vw-2rem))/2))] md:h-auto md:max-h-[calc(100dvh-3rem)] md:w-[min(52rem,calc(100vw-2rem))]';
 
 function CardOverlay({
     face,
@@ -151,13 +179,24 @@ function CardOverlay({
 function MenuLinks({ face, onClose }: { face: CardFace; onClose: () => void }) {
     const reduceMotion = useReducedMotion();
     return (
-        <nav className="flex w-full flex-col items-center justify-center gap-8 md:gap-10">
+        <nav className="flex flex-col gap-6 border-t border-neutral-200 px-8 py-8 dark:border-white/5 lg:border-l lg:border-t-0 lg:pr-14">
             {cardLinks(face).map((link, index) => {
-                const label = menuLabel(link);
-                const className = menuItemClass;
+                const name = linkName(link);
+                const hint = linkHint(link);
+                const className =
+                    'group block text-left text-neutral-900 transition-opacity hover:opacity-50 dark:text-neutral-100';
+                const body = (
+                    <>
+                        <span className="inline-flex items-center gap-2 text-lg font-bold tracking-tight lg:text-xl">
+                            {name}
+                            <ArrowUpRight size={16} className="text-neutral-400" aria-hidden="true" />
+                        </span>
+                        <span className="mt-1 block text-sm font-light text-neutral-500">{hint}</span>
+                    </>
+                );
                 return (
                     <motion.div
-                        key={label}
+                        key={name}
                         initial={reduceMotion ? false : { opacity: 0 }}
                         animate={{ opacity: 1 }}
                         transition={{ duration: reduceMotion ? 0 : 0.3, delay: reduceMotion ? 0 : 0.12 + index * 0.05 }}
@@ -168,14 +207,14 @@ function MenuLinks({ face, onClose }: { face: CardFace; onClose: () => void }) {
                                 target="_blank"
                                 rel="noopener noreferrer"
                                 className={className}
-                                aria-label={`${label} (opens in a new tab)`}
+                                aria-label={`${name}, ${hint} (opens in a new tab)`}
                                 onClick={onClose}
                             >
-                                {label}
+                                {body}
                             </a>
                         ) : (
-                            <Link to={link.href} className={className} onClick={onClose}>
-                                {label}
+                            <Link to={link.href} className={className} aria-label={`${name}, ${hint}`} onClick={onClose}>
+                                {body}
                             </Link>
                         )}
                     </motion.div>
@@ -185,20 +224,60 @@ function MenuLinks({ face, onClose }: { face: CardFace; onClose: () => void }) {
     );
 }
 
-function ExpandedCard({ face, origin, onClose }: { face: CardFace; origin: CardOrigin; onClose: () => void }) {
+function ExpandedCard({
+    face,
+    measureOrigin,
+    onClose,
+}: {
+    face: CardFace;
+    measureOrigin: () => CardOrigin;
+    onClose: () => void;
+}) {
     const panelRef = useRef<HTMLDivElement>(null);
     const reduceMotion = useReducedMotion();
-    const frame = expandedFrame();
-    const from = {
-        x: origin.left - frame.left,
-        y: origin.top - frame.top,
-        scaleX: origin.width / frame.width,
-        scaleY: origin.height / frame.height,
-    };
-    const settled = { x: 0, y: 0, scaleX: 1, scaleY: 1, opacity: 1 };
-    const cardMotion = reduceMotion
-        ? { initial: { ...settled, opacity: 0 }, animate: settled, exit: { ...settled, opacity: 0 } }
-        : { initial: { ...from, opacity: 1 }, animate: settled, exit: { ...from, opacity: 1 } };
+    const controls = useAnimationControls();
+    const [exitFlight, setExitFlight] = useState<Flight>(settledFlight);
+    const measureOriginRef = useRef(measureOrigin);
+    measureOriginRef.current = measureOrigin;
+
+    useLayoutEffect(() => {
+        const panel = panelRef.current;
+        if (panel === null) return;
+        let started = false;
+
+        const syncFlight = (startAnimation: boolean) => {
+            const frame = readLayoutBox(panel);
+            if (frame.width < 1 || frame.height < 1) return;
+            const next = flightBetween(measureOriginRef.current(), frame);
+            setExitFlight((current) => (sameFlight(current, next) ? current : next));
+            if (!startAnimation || started) return;
+            started = true;
+            if (reduceMotion) {
+                controls.set({ ...settledFlight, opacity: 0 });
+                void controls.start({ opacity: 1, transition: { duration: 0.2 } });
+                return;
+            }
+            controls.set(next);
+            void controls.start({
+                ...settledFlight,
+                transition: { duration: expandDuration, ease: expandEase },
+            });
+        };
+
+        syncFlight(true);
+        const onResize = () => syncFlight(false);
+        window.addEventListener('resize', onResize);
+        const observer = new ResizeObserver(onResize);
+        observer.observe(panel);
+        const source = panel.ownerDocument.querySelector('[data-project-card]');
+        const concealed = document.querySelector('#projects article.opacity-0 [data-project-card]');
+        if (concealed instanceof HTMLElement) observer.observe(concealed);
+        else if (source instanceof HTMLElement) observer.observe(source);
+        return () => {
+            window.removeEventListener('resize', onResize);
+            observer.disconnect();
+        };
+    }, [controls, reduceMotion]);
 
     useEffect(() => {
         const previousOverflow = document.body.style.overflow;
@@ -233,6 +312,8 @@ function ExpandedCard({ face, origin, onClose }: { face: CardFace; origin: CardO
         };
     }, [onClose]);
 
+    const exit = reduceMotion ? { ...settledFlight, opacity: 0 } : exitFlight;
+
     return (
         <motion.div
             className="fixed inset-0 z-[60]"
@@ -256,33 +337,25 @@ function ExpandedCard({ face, origin, onClose }: { face: CardFace; origin: CardO
                 role="dialog"
                 aria-modal="true"
                 aria-label={face.title}
-                initial={cardMotion.initial}
-                animate={cardMotion.animate}
-                exit={cardMotion.exit}
-                transition={{ duration: reduceMotion ? 0.2 : expandDuration, ease: expandEase }}
-                style={{
-                    position: 'fixed',
-                    top: frame.top,
-                    left: frame.left,
-                    width: frame.width,
-                    height: frame.height,
-                    originX: 0,
-                    originY: 0,
-                }}
-                className="flex min-h-0 flex-col overflow-hidden bg-neutral-50 text-neutral-900 shadow-lg dark:bg-neutral-900 dark:text-neutral-100 dark:shadow-white/5 border border-neutral-200 dark:border-white/5 rounded-sm"
+                data-expanded-card
+                initial={false}
+                animate={controls}
+                exit={exit}
+                style={{ originX: 0, originY: 0 }}
+                className={expandedPanelClass}
             >
-                    <div className="flex justify-end px-6 pt-6 md:px-8 md:pt-8">
-                        <button
-                            type="button"
-                            onClick={onClose}
-                            className="p-2 rounded-full hover:bg-black/10 dark:hover:bg-white/10 transition-colors text-black dark:text-white"
-                            aria-label="Close"
-                        >
-                            <X size={20} />
-                        </button>
-                    </div>
-                    <div className="flex min-h-0 flex-1 flex-col justify-center gap-10 px-8 pb-10 md:grid md:grid-cols-2 md:items-center md:gap-16 md:px-14 md:pb-14">
-                        <div className="min-w-0">
+                <div className="sticky top-0 z-10 flex h-0 justify-end overflow-visible">
+                    <button
+                        type="button"
+                        onClick={onClose}
+                        className="relative top-3 right-3 rounded-full p-2 text-black transition-colors hover:bg-black/10 dark:text-white dark:hover:bg-white/10"
+                        aria-label="Close"
+                    >
+                        <X size={20} />
+                    </button>
+                </div>
+                <div className="lg:grid lg:grid-cols-[minmax(0,1.35fr)_minmax(13rem,0.85fr)] lg:items-start">
+                        <div className="min-w-0 p-8 pr-14">
                             <div className="mb-6 flex flex-wrap items-center gap-2">
                                 <span className="text-neutral-500 font-mono text-xs tracking-widest uppercase">
                                     {face.eyebrow}
@@ -293,10 +366,10 @@ function ExpandedCard({ face, origin, onClose }: { face: CardFace; origin: CardO
                                     </span>
                                 )}
                             </div>
-                            <h3 className="mb-3 break-words text-xl font-bold text-neutral-900 dark:text-neutral-100 md:text-3xl">
+                            <h3 className="mb-3 break-words text-xl font-bold tracking-tight text-neutral-900 dark:text-neutral-100 lg:text-2xl">
                                 {face.title}
                             </h3>
-                            <p className="mb-6 text-sm font-light leading-relaxed text-neutral-600 dark:text-neutral-400 md:text-base">
+                            <p className="mb-6 text-sm font-light leading-relaxed text-neutral-600 dark:text-neutral-400">
                                 {face.summary}
                             </p>
                             <div className="flex flex-wrap gap-2 border-t border-neutral-200 pt-4 dark:border-white/5">
@@ -309,7 +382,7 @@ function ExpandedCard({ face, origin, onClose }: { face: CardFace; origin: CardO
                         </div>
                         <MenuLinks face={face} onClose={onClose} />
                     </div>
-                </motion.div>
+            </motion.div>
         </motion.div>
     );
 }
@@ -388,7 +461,7 @@ function ProjectCard({
 }
 
 export default function Work() {
-    const [open, setOpen] = useState<{ face: CardFace; origin: CardOrigin } | null>(null);
+    const [open, setOpen] = useState<CardFace | null>(null);
     const [concealedId, setConcealedId] = useState<string | null>(null);
     const triggerRef = useRef<HTMLButtonElement | null>(null);
     const closeMenu = useCallback(() => {
@@ -408,7 +481,12 @@ export default function Work() {
     const openMenu = useCallback((face: CardFace, trigger: HTMLButtonElement) => {
         triggerRef.current = trigger;
         setConcealedId(face.id);
-        setOpen({ face, origin: readCardOrigin(trigger) });
+        setOpen(face);
+    }, []);
+    const measureOrigin = useCallback((): CardOrigin => {
+        const trigger = triggerRef.current;
+        if (trigger?.isConnected) return readCardOrigin(trigger);
+        return { top: 0, left: 0, width: 1, height: 1 };
     }, []);
 
     return (
@@ -525,7 +603,7 @@ export default function Work() {
                             key={face.id}
                             face={face}
                             index={index}
-                            expanded={open?.face.id === face.id}
+                            expanded={open?.id === face.id}
                             concealed={concealedId === face.id}
                             onOpen={openMenu}
                         />
@@ -533,7 +611,7 @@ export default function Work() {
                 </div>
                 <AnimatePresence onExitComplete={finishClose}>
                     {open ? (
-                        <ExpandedCard key={open.face.id} face={open.face} origin={open.origin} onClose={closeMenu} />
+                        <ExpandedCard key={open.id} face={open} measureOrigin={measureOrigin} onClose={closeMenu} />
                     ) : null}
                 </AnimatePresence>
             </div>
