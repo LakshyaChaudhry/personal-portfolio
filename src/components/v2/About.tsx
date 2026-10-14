@@ -25,7 +25,7 @@ export default function About() {
                     className="space-y-8 text-xl md:text-3xl font-light text-neutral-800 dark:text-neutral-200 leading-relaxed"
                 >
                     <p>
-                        I am a student learning about <span className="font-normal text-black dark:text-white">AI Alignment</span>, <span className="font-normal text-black dark:text-white">Applied AI</span>, and building robust systems that can tackle the complexities of the real world from first principles.
+                        I research <span className="font-normal text-black dark:text-white">AI alignment</span> and build <span className="font-normal text-black dark:text-white">applied systems</span> that hold up in the real world. I start from first principles.
                     </p>
 
                     <p className="text-neutral-600 dark:text-neutral-400">
