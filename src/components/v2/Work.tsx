@@ -2,7 +2,7 @@ import { motion } from 'framer-motion';
 import { Link } from 'react-router-dom';
 import { ArrowUpRight, FileText, Github } from 'lucide-react';
 import { cardFaces, experienceRows } from '../../data/projects';
-import type { CardFace } from '../../data/projects';
+import type { CardFace, CardLink } from '../../data/projects';
 
 function TagList({ tags }: { tags: readonly string[] }) {
     return (
@@ -24,14 +24,14 @@ function destinationAriaLabel(label: string, title: string, external: boolean): 
     return external ? `${name} (opens in a new tab)` : name;
 }
 
-function DestinationIcon({ label }: { label: CardFace['activation']['label'] }) {
+function CornerIcon({ label }: { label: CardLink['label'] }) {
     switch (label) {
         case 'Writeup':
-            return <ArrowUpRight size={14} aria-hidden="true" className="shrink-0" />;
+            return <ArrowUpRight size={18} aria-hidden="true" />;
         case 'Paper':
-            return <FileText size={14} aria-hidden="true" className="shrink-0" />;
+            return <FileText size={18} aria-hidden="true" />;
         case 'Code':
-            return <Github size={14} aria-hidden="true" className="shrink-0" />;
+            return <Github size={18} aria-hidden="true" />;
         default: {
             const unexpected: never = label;
             return unexpected;
@@ -39,51 +39,52 @@ function DestinationIcon({ label }: { label: CardFace['activation']['label'] }) 
     }
 }
 
-const activationClass =
-    "after:absolute after:inset-0 after:content-[''] rounded-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-neutral-900 dark:focus-visible:outline-white";
+const iconClass =
+    'relative z-20 text-neutral-400 hover:text-black dark:hover:text-white focus-visible:text-black dark:focus-visible:text-white transition-colors';
 
-function Activation({ face }: { face: CardFace }) {
+function CornerLink({ link, title }: { link: CardLink; title: string }) {
+    const icon = <CornerIcon label={link.label} />;
+    const ariaLabel = destinationAriaLabel(link.label, title, link.external);
+    if (link.external) {
+        return (
+            <a href={link.href} target="_blank" rel="noopener noreferrer" className={iconClass} aria-label={ariaLabel}>
+                {icon}
+            </a>
+        );
+    }
+    return (
+        <Link to={link.href} className={iconClass} aria-label={ariaLabel}>
+            {icon}
+        </Link>
+    );
+}
+
+function cornerLinks(face: CardFace): CardLink[] {
+    const code = face.activation.label === 'Code' ? face.activation : face.links.find((link) => link.label === 'Code');
+    const paper = face.activation.label === 'Paper' ? face.activation : face.links.find((link) => link.label === 'Paper');
+    const links: CardLink[] = [];
+    if (code) links.push(code);
+    if (face.activation.label === 'Writeup') links.push(face.activation);
+    if (paper) links.push(paper);
+    return links;
+}
+
+const cardLinkClass = 'absolute inset-0 z-10 cursor-pointer rounded-sm focus-visible:outline-none';
+
+function CardOverlay({ face }: { face: CardFace }) {
     const { activation, title } = face;
-    const ariaLabel = destinationAriaLabel(activation.label, title, activation.external);
     if (activation.external) {
         return (
             <a
                 href={activation.href}
                 target="_blank"
                 rel="noopener noreferrer"
-                className={activationClass}
-                aria-label={ariaLabel}
-            >
-                {title}
-            </a>
+                className={cardLinkClass}
+                aria-label={`${title} (opens in a new tab)`}
+            />
         );
     }
-    return (
-        <Link to={activation.href} className={activationClass} aria-label={ariaLabel}>
-            {title}
-        </Link>
-    );
-}
-
-function ActionLink({ link, title }: { link: CardFace['links'][number]; title: string }) {
-    const className = [
-        'min-h-11 px-3 inline-flex items-center gap-1.5 pointer-events-auto relative z-10',
-        'text-[10px] uppercase tracking-widest font-mono border',
-        'border-neutral-200 text-neutral-500 hover:text-neutral-900 hover:border-neutral-900',
-        'dark:border-white/15 dark:text-neutral-400 dark:hover:text-white dark:hover:border-white',
-    ].join(' ');
-    return (
-        <a
-            href={link.href}
-            target="_blank"
-            rel="noopener noreferrer"
-            className={className}
-            aria-label={destinationAriaLabel(link.label, title, link.external)}
-        >
-            <DestinationIcon label={link.label} />
-            {link.label}
-        </a>
-    );
+    return <Link to={activation.href} className={cardLinkClass} aria-label={title} />;
 }
 
 const toneClass = {
@@ -91,7 +92,7 @@ const toneClass = {
         'text-emerald-600 dark:text-emerald-400 border-emerald-300 dark:border-emerald-600/50 bg-emerald-50 dark:bg-emerald-950/30',
     review:
         'text-amber-600 dark:text-amber-400 border-amber-300 dark:border-amber-600/50 bg-amber-50 dark:bg-amber-950/30',
-    sky: 'text-sky-700 dark:text-sky-300 border-sky-300 dark:border-sky-600/50 bg-sky-50 dark:bg-sky-950/30',
+    sky: 'text-neutral-400 border-neutral-300 dark:border-white/20',
     neutral: 'text-neutral-400 border-neutral-300 dark:border-white/20',
 } as const;
 
@@ -102,42 +103,41 @@ function ProjectCard({ face, index }: { face: CardFace; index: number }) {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true, margin: '-50px' }}
             transition={{ duration: 0.5, delay: index * 0.1 }}
-            className="group relative min-w-0 h-full flex flex-col bg-neutral-50 dark:bg-neutral-900/20 border border-neutral-200 dark:border-white/5 p-5 sm:p-8 rounded-sm transition-all duration-500 ring-1 ring-transparent hover:ring-black dark:hover:ring-white focus-within:ring-black dark:focus-within:ring-white md:hover:-translate-y-1 md:hover:shadow-lg dark:md:hover:shadow-white/5"
+            className="group relative flex h-full min-w-0 cursor-pointer flex-col bg-neutral-50 dark:bg-neutral-900/20 border border-neutral-200 dark:border-white/5 p-8 transition-all duration-500 rounded-sm hover:-translate-y-1 hover:shadow-lg dark:hover:shadow-white/5 ring-1 ring-transparent hover:ring-black dark:hover:ring-white focus-within:ring-black dark:focus-within:ring-white"
         >
-            <div className="flex flex-wrap items-center gap-x-2 gap-y-2 mb-5">
-                <span className="text-neutral-500 font-mono text-xs tracking-widest uppercase">
-                    {face.eyebrow}
-                </span>
-                {face.status && (
-                    <span className={`text-[10px] font-mono tracking-wider px-2 py-0.5 rounded-full border max-w-full ${toneClass[face.status.tone]}`}>
-                        {face.status.label}
+            <CardOverlay face={face} />
+            <div className="flex justify-between items-start mb-6">
+                <div className="flex min-w-0 flex-wrap items-center gap-2">
+                    <span className="text-neutral-500 font-mono text-xs tracking-widest uppercase">
+                        {face.eyebrow}
                     </span>
-                )}
+                    {face.status && (
+                        <span className={`text-[10px] font-mono tracking-wider px-2 py-0.5 rounded-full border ${toneClass[face.status.tone]}`}>
+                            {face.status.label}
+                        </span>
+                    )}
+                </div>
+                <div className="flex gap-3 shrink-0">
+                    {cornerLinks(face).map((link) => (
+                        <CornerLink key={link.label} link={link} title={face.title} />
+                    ))}
+                </div>
             </div>
 
-            <h3 className="text-lg sm:text-xl font-bold mb-3 leading-snug break-words text-neutral-900 dark:text-neutral-100 group-hover:text-black dark:group-hover:text-white transition-colors">
-                <Activation face={face} />
+            <h3 className="text-xl font-bold mb-3 break-words text-neutral-900 dark:text-neutral-100 group-hover:text-black dark:group-hover:text-white transition-colors">
+                {face.title}
             </h3>
 
-            <p className="pointer-events-none text-sm text-neutral-600 dark:text-neutral-400 mb-6 font-light leading-relaxed flex-grow">
+            <p className="text-sm text-neutral-600 dark:text-neutral-400 mb-6 font-light leading-relaxed flex-grow">
                 {face.summary}
             </p>
 
-            <div className="relative z-10 flex flex-wrap gap-2 mb-5 pointer-events-none">
-                <span
-                    aria-hidden="true"
-                    className="pointer-events-none min-h-11 px-3 inline-flex items-center gap-1.5 text-[10px] uppercase tracking-widest font-mono border border-neutral-900 text-neutral-900 dark:border-white dark:text-white"
-                >
-                    <DestinationIcon label={face.activation.label} />
-                    {face.activation.label}
-                </span>
-                {face.links.map((link) => (
-                    <ActionLink key={link.label} link={link} title={face.title} />
+            <div className="flex flex-wrap gap-2 mt-auto pt-4 border-t border-neutral-200 dark:border-white/5">
+                {face.tags.map((tag) => (
+                    <span key={tag} className="text-[10px] uppercase tracking-wider font-mono text-neutral-500">
+                        {tag}
+                    </span>
                 ))}
-            </div>
-
-            <div className="pointer-events-none">
-                <TagList tags={face.tags} />
             </div>
         </motion.article>
     );
