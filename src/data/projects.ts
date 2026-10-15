@@ -93,7 +93,7 @@ const cards = [
     id: "res-beyond-lie-detection",
     kind: "research",
     title: "Beyond Lie Detection: Sample-Level White-Box Auditing of Alignment Faking",
-    summary: "Introduced a per-rollout labeling procedure separating alignment faking from plain lying and situational awareness. Probes trained on controlled synthetic AF data gain +12% AUROC and +15% AUPRC over existing lie-detection baselines.",
+    summary: "Introduced a per-rollout labeling procedure separating alignment faking from plain lying and situational awareness. Probes trained on controlled synthetic AF data gain +28% AUROC and +33% AUPRC over existing lie-detection baselines.",
     tags: [
       "Mechanistic Interpretability",
       "Linear Probes",

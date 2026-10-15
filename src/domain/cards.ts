@@ -150,7 +150,8 @@ function destinationLinks(card: Resolved): readonly [CardLink, ...CardLink[]] {
       external: false,
     })
   }
-  if (card.paper !== undefined) {
+  // Same URL as the repo means the preprint is not published yet.
+  if (card.paper !== undefined && card.paper !== card.code) {
     links.push({ label: 'Paper', href: card.paper, external: true })
   }
   if (card.code !== undefined) {

@@ -392,8 +392,8 @@ const toneClass = {
         'text-emerald-600 dark:text-emerald-400 border-emerald-300 dark:border-emerald-600/50 bg-emerald-50 dark:bg-emerald-950/30',
     review:
         'text-amber-600 dark:text-amber-400 border-amber-300 dark:border-amber-600/50 bg-amber-50 dark:bg-amber-950/30',
-    sky: 'text-neutral-400 border-neutral-300 dark:border-white/20',
-    neutral: 'text-neutral-400 border-neutral-300 dark:border-white/20',
+    sky: 'text-neutral-600 border-neutral-500 dark:text-neutral-400 dark:border-white/20',
+    neutral: 'text-neutral-600 border-neutral-500 dark:text-neutral-400 dark:border-white/20',
 } as const;
 
 function ProjectCard({
