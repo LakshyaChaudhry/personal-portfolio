@@ -1,5 +1,5 @@
-import { useCallback, useLayoutEffect, useRef, useState } from 'react';
-import { AnimatePresence, MotionConfig, motion } from 'framer-motion';
+import { useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react';
+import { AnimatePresence, MotionConfig, motion, useIsPresent } from 'framer-motion';
 import { Link } from 'react-router-dom';
 import { ArrowUpRight, FileText, Github, X } from 'lucide-react';
 import { cardFaces, experienceRows } from '../../data/projects';
@@ -102,16 +102,28 @@ function shellId(face: CardFace): string {
     return `project-card-shell-${face.id}`;
 }
 
+// Counted so a panel that opens while another is still closing cannot restore a locked state.
+let scrollLocks = 0;
+let unlockedStyle = { overflow: '', paddingRight: '' };
+
 function lockPageScroll(): () => void {
     const root = document.documentElement;
     const body = document.body;
-    const gutter = window.innerWidth - root.clientWidth;
-    const previous = { overflow: root.style.overflow, paddingRight: body.style.paddingRight };
-    root.style.overflow = 'hidden';
-    if (gutter > 0) body.style.paddingRight = `${gutter}px`;
+    if (scrollLocks === 0) {
+        const gutter = window.innerWidth - root.clientWidth;
+        unlockedStyle = { overflow: root.style.overflow, paddingRight: body.style.paddingRight };
+        root.style.overflow = 'hidden';
+        if (gutter > 0) body.style.paddingRight = `${gutter}px`;
+    }
+    scrollLocks += 1;
+    let released = false;
     return () => {
-        root.style.overflow = previous.overflow;
-        body.style.paddingRight = previous.paddingRight;
+        if (released) return;
+        released = true;
+        scrollLocks -= 1;
+        if (scrollLocks > 0) return;
+        root.style.overflow = unlockedStyle.overflow;
+        body.style.paddingRight = unlockedStyle.paddingRight;
     };
 }
 
@@ -222,6 +234,8 @@ function MenuLinks({ face, onClose }: { face: CardFace; onClose: () => void }) {
 
 function ExpandedCard({ face, onClose }: { face: CardFace; onClose: () => void }) {
     const panelRef = useRef<HTMLDivElement>(null);
+    // Once closing starts the overlay must not swallow clicks meant for the grid.
+    const isPresent = useIsPresent();
     const onCloseRef = useRef(onClose);
     onCloseRef.current = onClose;
 
@@ -258,7 +272,10 @@ function ExpandedCard({ face, onClose }: { face: CardFace; onClose: () => void }
     }, []);
 
     return (
-        <div className="fixed inset-0 z-[60] md:flex md:items-center md:justify-center md:p-6" role="presentation">
+        <div
+            className={`fixed inset-0 z-[60] md:flex md:items-center md:justify-center md:p-6 ${isPresent ? '' : 'pointer-events-none'}`}
+            role="presentation"
+        >
             <motion.div
                 aria-hidden="true"
                 className="absolute inset-0 cursor-pointer bg-neutral-950/40 dark:bg-black/60"
@@ -343,7 +360,7 @@ function ProjectCard({
             viewport={{ once: true, margin: '-50px' }}
             transition={{ duration: 0.5, delay: index * 0.1 }}
             // While the shell flies back it has to sit above the fading backdrop.
-            className={`group relative h-full min-w-0 cursor-pointer ${returning ? 'z-[70]' : ''}`}
+            className={`group relative h-full min-w-0 cursor-pointer ${returning && !expanded ? 'z-[70]' : ''}`}
         >
             <div
                 data-project-card
@@ -399,12 +416,19 @@ export default function Work() {
         setOpen(null);
     }, [open]);
     const clearReturning = useCallback(() => setReturningId(null), []);
+    // Fallback for when no layout animation runs (reduced motion, interrupted flight).
+    useEffect(() => {
+        if (returningId === null) return;
+        const timer = window.setTimeout(clearReturning, 800);
+        return () => window.clearTimeout(timer);
+    }, [returningId, clearReturning]);
     const finishClose = useCallback(() => {
         const trigger = triggerRef.current;
         if (trigger?.isConnected) trigger.focus({ preventScroll: true });
     }, []);
     const openMenu = useCallback((face: CardFace, trigger: HTMLButtonElement) => {
         triggerRef.current = trigger;
+        setReturningId(null);
         setOpen(face);
     }, []);
 
