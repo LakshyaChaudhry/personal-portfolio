@@ -6,6 +6,8 @@ tags: ["grpo", "post-training", "rl", "qwen"]
 published: true
 ---
 
+import { RL_OR_DATA_PAPER_URL } from "../papers";
+
 ![Test accuracy by training arm. GRPO sits above rejection-sampling fine-tuning on easy, mixed, and curated prompts.](/assets/blog/rl-or-data-test-accuracy.png)
 
 *Lakshya Chaudhry, Purdue University.*
@@ -110,6 +112,12 @@ These are measurements of two methods under fixed budgets. They are not a genera
 Code, adapters, per-seed metrics, and the pre-registration are in the [project repo](https://github.com/LakshyaChaudhry/rl-or-data). The preprint is not on arXiv yet.
 
 <p>
+  {RL_OR_DATA_PAPER_URL === "https://github.com/LakshyaChaudhry/rl-or-data" ? null : (
+    <>
+      <a href={RL_OR_DATA_PAPER_URL}>Paper</a>
+      {" · "}
+    </>
+  )}
   <a href="https://github.com/LakshyaChaudhry/rl-or-data">Code</a>
 </p>
 
