@@ -8,7 +8,16 @@ published: true
 
 import { RL_OR_DATA_PAPER_URL } from "../papers";
 
-![Test accuracy by training arm. GRPO sits above rejection-sampling fine-tuning on easy, mixed, and curated prompts.](/assets/blog/rl-or-data-test-accuracy.png)
+<div style={{display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '1rem', marginBottom: '2rem'}}>
+  <a href={RL_OR_DATA_PAPER_URL} target="_blank" rel="noopener noreferrer" style={{textDecoration: 'none', color: 'inherit', cursor: 'pointer', display: 'block'}}>
+    <img src="/assets/blog/paper-rl-or-data-preview.png" alt="Is It RL or Data? PDF, first page" style={{width: '100%', borderRadius: '0.5rem', border: '1px solid rgba(128,128,128,0.25)', margin: 0}} />
+    <div style={{marginTop: '0.5rem', fontSize: '0.7rem', letterSpacing: '0.12em', textTransform: 'uppercase', opacity: 0.55, fontFamily: 'ui-monospace, SFMono-Regular, Menlo, monospace'}}>Preprint · PDF</div>
+  </a>
+  <a href={`${RL_OR_DATA_PAPER_URL}#page=7`} target="_blank" rel="noopener noreferrer" style={{textDecoration: 'none', color: 'inherit', cursor: 'pointer', display: 'block'}}>
+    <img src="/assets/blog/paper-rl-or-data-results.png" alt="Figure 1 of the paper: test accuracy by difficulty tier for every arm" style={{width: '100%', borderRadius: '0.5rem', border: '1px solid rgba(128,128,128,0.25)', margin: 0}} />
+    <div style={{marginTop: '0.5rem', fontSize: '0.7rem', letterSpacing: '0.12em', textTransform: 'uppercase', opacity: 0.55, fontFamily: 'ui-monospace, SFMono-Regular, Menlo, monospace'}}>Results by difficulty · p. 7</div>
+  </a>
+</div>
 
 *Lakshya Chaudhry, Purdue University.*
 
@@ -58,6 +67,8 @@ The number I report is greedy accuracy on 300 held-out problems, 100 per difficu
 | GRPO, mixed | 78.8% ± 0.5 | 8.7% |
 | GRPO, curated | 77.8% ± 1.7 | 7.6% |
 | Iterated RFT, curated | 70.1% ± 0.5 | 1.6% |
+
+![Test accuracy by training arm. GRPO sits above rejection-sampling fine-tuning on easy, mixed, and curated prompts.](/assets/blog/rl-or-data-test-accuracy.png)
 
 Means over three seeds. The base model is a single run. GRPO on mixed and curated prompts is past a 5% truncation flag I set before training.
 
@@ -109,15 +120,11 @@ These are measurements of two methods under fixed budgets. They are not a genera
 
 ---
 
-Code, adapters, per-seed metrics, and the pre-registration are in the [project repo](https://github.com/LakshyaChaudhry/rl-or-data). The preprint is not on arXiv yet.
+The [paper](/assets/blog/chaudhry-2026-rl-or-data.pdf) has the full method, every paired comparison, and the appendices. Code, adapters, per-seed metrics, and the pre-registration are in the [project repo](https://github.com/LakshyaChaudhry/rl-or-data).
 
 <p>
-  {RL_OR_DATA_PAPER_URL === "https://github.com/LakshyaChaudhry/rl-or-data" ? null : (
-    <>
-      <a href={RL_OR_DATA_PAPER_URL}>Paper</a>
-      {" · "}
-    </>
-  )}
+  <a href={RL_OR_DATA_PAPER_URL} target="_blank" rel="noopener noreferrer">Paper (PDF)</a>
+  {" · "}
   <a href="https://github.com/LakshyaChaudhry/rl-or-data">Code</a>
 </p>
 

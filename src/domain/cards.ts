@@ -11,6 +11,9 @@ export type VenueStatus =
   | { readonly kind: 'accepted'; readonly venue: string }
   | { readonly kind: 'in-progress' }
 
+/** A hosted paper is either an external https URL or a PDF served from /assets. */
+export type PaperHref = `https://${string}` | `/assets/${string}.pdf`
+
 type CardBase = {
   readonly id: string
   readonly kind: 'research' | 'project'
@@ -18,14 +21,14 @@ type CardBase = {
   readonly summary: string
   readonly tags: readonly [string, ...string[]]
   readonly status?: VenueStatus
-  readonly paper?: `https://${string}`
+  readonly paper?: PaperHref
   readonly code?: `https://${string}`
 }
 
 export type CardDraft =
   | (CardBase & { readonly writeup: BlogSlug; readonly publishedOn?: never })
   | (CardBase & { readonly writeup?: never; readonly publishedOn: IsoDate } & (
-      | { readonly paper: `https://${string}` }
+      | { readonly paper: PaperHref }
       | { readonly code: `https://${string}` }
     ))
 
@@ -44,7 +47,7 @@ export type WorkDraft = {
 
 export type CardLink =
   | { readonly label: 'Writeup'; readonly href: `/blog/${string}`; readonly external: false }
-  | { readonly label: 'Paper'; readonly href: `https://${string}`; readonly external: true }
+  | { readonly label: 'Paper'; readonly href: PaperHref; readonly external: true }
   | { readonly label: 'Code'; readonly href: `https://${string}`; readonly external: true }
 
 export type CardFace = {
@@ -82,12 +85,12 @@ type Resolved = {
 } & (
   | {
       readonly writeup: BlogSlug
-      readonly paper?: `https://${string}`
+      readonly paper?: PaperHref
       readonly code?: `https://${string}`
     }
   | {
       readonly writeup?: undefined
-      readonly paper: `https://${string}`
+      readonly paper: PaperHref
       readonly code?: `https://${string}`
     }
   | {
@@ -178,14 +181,16 @@ function rejectBlank(id: string, field: 'title' | 'summary' | 'tag', value: stri
   if (value.trim() === '') throw new Error(`blank ${field} on '${id}'`)
 }
 
-function rejectBadUrl(id: string, url: string | undefined): void {
+function rejectBadUrl(id: string, url: string | undefined, allowAsset = false): void {
   if (url === undefined) return
-  if (!url.startsWith('https://')) throw new Error(`bad url on '${id}'`)
+  if (url.startsWith('https://')) return
+  if (allowAsset && /^\/assets\/[^?#]+\.pdf$/.test(url)) return
+  throw new Error(`bad url on '${id}'`)
 }
 
 function resolveCard(card: CardDraft): Resolved {
   const id = card.id
-  rejectBadUrl(id, card.paper)
+  rejectBadUrl(id, card.paper, true)
   rejectBadUrl(id, card.code)
   const shared = {
     id: card.id,

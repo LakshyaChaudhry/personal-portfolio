@@ -1,5 +1,5 @@
 import { useCallback, useLayoutEffect, useRef, useState } from 'react';
-import { AnimatePresence, motion, useAnimationControls, useReducedMotion } from 'framer-motion';
+import { AnimatePresence, MotionConfig, motion } from 'framer-motion';
 import { Link } from 'react-router-dom';
 import { ArrowUpRight, FileText, Github, X } from 'lucide-react';
 import { cardFaces, experienceRows } from '../../data/projects';
@@ -90,45 +90,30 @@ function linkHint(link: CardLink): string {
     return 'preprint';
 }
 
-const expandEase = [0.4, 0, 0.2, 1] as const;
-const expandDuration = 0.7;
+// One spring for both directions. The shell is the only thing that moves.
+const shellSpring = { type: 'spring', bounce: 0, duration: 0.45 } as const;
+const contentIn = { duration: 0.2, delay: 0.12, ease: 'easeOut' } as const;
+const contentOut = { duration: 0.1, ease: 'easeIn' } as const;
 
-type CardOrigin = { top: number; left: number; width: number; height: number };
+const shellClass =
+    'absolute inset-0 border border-neutral-200 bg-neutral-50 dark:border-white/5 dark:bg-neutral-900';
 
-type Flight = { x: number; y: number; scaleX: number; scaleY: number; opacity: number };
-
-const settledFlight: Flight = { x: 0, y: 0, scaleX: 1, scaleY: 1, opacity: 1 };
-
-function readCardOrigin(trigger: HTMLElement): CardOrigin {
-    const card = trigger.closest('[data-project-card]');
-    const rect = (card ?? trigger).getBoundingClientRect();
-    return { top: rect.top, left: rect.left, width: rect.width, height: rect.height };
+function shellId(face: CardFace): string {
+    return `project-card-shell-${face.id}`;
 }
 
-function readLayoutBox(element: HTMLElement): CardOrigin {
-    const style = getComputedStyle(element);
-    return {
-        top: Number.parseFloat(style.top) || 0,
-        left: Number.parseFloat(style.left) || 0,
-        width: element.offsetWidth,
-        height: element.offsetHeight,
+function lockPageScroll(): () => void {
+    const root = document.documentElement;
+    const body = document.body;
+    const gutter = window.innerWidth - root.clientWidth;
+    const previous = { overflow: root.style.overflow, paddingRight: body.style.paddingRight };
+    root.style.overflow = 'hidden';
+    if (gutter > 0) body.style.paddingRight = `${gutter}px`;
+    return () => {
+        root.style.overflow = previous.overflow;
+        body.style.paddingRight = previous.paddingRight;
     };
 }
-
-function flightBetween(origin: CardOrigin, frame: CardOrigin): Flight {
-    const width = frame.width > 0 ? frame.width : 1;
-    const height = frame.height > 0 ? frame.height : 1;
-    return {
-        x: origin.left - frame.left,
-        y: origin.top - frame.top,
-        scaleX: origin.width / width,
-        scaleY: origin.height / height,
-        opacity: 1,
-    };
-}
-
-const expandedPanelClass =
-    'fixed overflow-y-auto rounded-sm border border-neutral-200 bg-neutral-50 text-neutral-900 shadow-lg dark:border-white/5 dark:bg-neutral-900 dark:text-neutral-100 dark:shadow-white/5 inset-0 h-dvh w-full md:inset-auto md:top-6 md:right-auto md:bottom-auto md:left-[max(1rem,calc((100vw-min(52rem,100vw-2rem))/2))] md:h-auto md:max-h-[calc(100dvh-3rem)] md:w-[min(52rem,calc(100vw-2rem))]';
 
 function CardOverlay({
     face,
@@ -167,148 +152,88 @@ function CardOverlay({
     return <Link to={activation.href} className={cardLinkClass} aria-label={face.title} />;
 }
 
-function MenuLinks({ face, onClose }: { face: CardFace; onClose: () => void }) {
-    const reduceMotion = useReducedMotion();
+function CardHeading({ face }: { face: CardFace }) {
     return (
-        <nav className="flex flex-col gap-6 border-t border-neutral-200 px-8 py-8 dark:border-white/5 lg:border-l lg:border-t-0 lg:pr-14">
-            {cardLinks(face).map((link, index) => {
+        <div className="flex min-w-0 flex-wrap items-center gap-2">
+            <span className="text-neutral-500 font-mono text-xs tracking-widest uppercase">{face.eyebrow}</span>
+            {face.status && (
+                <span className={`text-[10px] font-mono tracking-wider px-2 py-0.5 rounded-full border ${toneClass[face.status.tone]}`}>
+                    {face.status.label}
+                </span>
+            )}
+        </div>
+    );
+}
+
+function CardTags({ face }: { face: CardFace }) {
+    return (
+        <div className="flex flex-wrap gap-2 border-t border-neutral-200 pt-4 dark:border-white/5">
+            {face.tags.map((tag) => (
+                <span key={tag} className="text-[10px] uppercase tracking-wider font-mono text-neutral-500">
+                    {tag}
+                </span>
+            ))}
+        </div>
+    );
+}
+
+function MenuLinks({ face, onClose }: { face: CardFace; onClose: () => void }) {
+    return (
+        <nav aria-label={`Links for ${face.title}`} className="mt-8 border-t border-neutral-200 dark:border-white/5">
+            {cardLinks(face).map((link) => {
                 const name = linkName(link);
                 const hint = linkHint(link);
                 const className =
-                    'group block text-left text-neutral-900 transition-opacity hover:opacity-50 dark:text-neutral-100';
+                    'group/link flex items-center justify-between gap-4 border-b border-neutral-200 py-4 text-neutral-900 transition-opacity hover:opacity-50 focus-visible:opacity-50 focus-visible:outline-none dark:border-white/5 dark:text-neutral-100';
                 const body = (
                     <>
-                        <span className="inline-flex items-center gap-2 text-lg font-bold tracking-tight lg:text-xl">
-                            {name}
-                            <ArrowUpRight size={16} className="text-neutral-400" aria-hidden="true" />
+                        <span className="text-lg font-bold tracking-tight">{name}</span>
+                        <span className="flex items-center gap-2 text-xs font-mono uppercase tracking-wider text-neutral-500">
+                            {hint}
+                            <ArrowUpRight
+                                size={16}
+                                className="text-neutral-400 transition-transform group-hover/link:-translate-y-0.5 group-hover/link:translate-x-0.5"
+                                aria-hidden="true"
+                            />
                         </span>
-                        <span className="mt-1 block text-sm font-light text-neutral-500">{hint}</span>
                     </>
                 );
-                return (
-                    <motion.div
+                return link.external ? (
+                    <a
                         key={name}
-                        initial={reduceMotion ? false : { opacity: 0 }}
-                        animate={{ opacity: 1 }}
-                        transition={{ duration: reduceMotion ? 0 : 0.3, delay: reduceMotion ? 0 : 0.12 + index * 0.05 }}
+                        href={link.href}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className={className}
+                        aria-label={`${name}, ${hint} (opens in a new tab)`}
+                        onClick={onClose}
                     >
-                        {link.external ? (
-                            <a
-                                href={link.href}
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                className={className}
-                                aria-label={`${name}, ${hint} (opens in a new tab)`}
-                                onClick={onClose}
-                            >
-                                {body}
-                            </a>
-                        ) : (
-                            <Link to={link.href} className={className} aria-label={`${name}, ${hint}`} onClick={onClose}>
-                                {body}
-                            </Link>
-                        )}
-                    </motion.div>
+                        {body}
+                    </a>
+                ) : (
+                    <Link key={name} to={link.href} className={className} aria-label={`${name}, ${hint}`} onClick={onClose}>
+                        {body}
+                    </Link>
                 );
             })}
         </nav>
     );
 }
 
-function ExpandedCard({
-    face,
-    measureOrigin,
-    onClose,
-}: {
-    face: CardFace;
-    measureOrigin: () => CardOrigin;
-    onClose: () => void;
-}) {
+function ExpandedCard({ face, onClose }: { face: CardFace; onClose: () => void }) {
     const panelRef = useRef<HTMLDivElement>(null);
-    const closingRef = useRef(false);
-    const reduceMotion = useReducedMotion();
-    const controls = useAnimationControls();
-    const [closing, setClosing] = useState(false);
-    const measureOriginRef = useRef(measureOrigin);
-    measureOriginRef.current = measureOrigin;
-
-    const requestClose = useCallback(() => {
-        if (closingRef.current) return;
-        closingRef.current = true;
-        const panel = panelRef.current;
-        if (reduceMotion || panel === null) {
-            onClose();
-            return;
-        }
-        const frame = readLayoutBox(panel);
-        const flight = flightBetween(measureOriginRef.current(), frame);
-        panel.style.top = `${frame.top}px`;
-        panel.style.left = `${frame.left}px`;
-        panel.style.width = `${frame.width}px`;
-        panel.style.height = `${frame.height}px`;
-        panel.style.maxHeight = 'none';
-        panel.style.overflow = 'hidden';
-        setClosing(true);
-        void controls
-            .start({
-                x: flight.x,
-                y: flight.y,
-                scaleX: flight.scaleX,
-                scaleY: flight.scaleY,
-                opacity: 1,
-                transition: { duration: expandDuration, ease: expandEase },
-            })
-            .then(() => onClose());
-    }, [controls, onClose, reduceMotion]);
-
-    const requestCloseRef = useRef(requestClose);
-    requestCloseRef.current = requestClose;
-    const lockedScroll = useRef<number | null>(null);
+    const onCloseRef = useRef(onClose);
+    onCloseRef.current = onClose;
 
     useLayoutEffect(() => {
-        const body = document.body;
-        if (lockedScroll.current === null) lockedScroll.current = window.scrollY;
-        const scrollY = lockedScroll.current;
-        const gutter = window.innerWidth - document.documentElement.clientWidth;
-        const previous = {
-            position: body.style.position,
-            top: body.style.top,
-            left: body.style.left,
-            right: body.style.right,
-            width: body.style.width,
-            overflow: body.style.overflow,
-            paddingRight: body.style.paddingRight,
-        };
-        body.style.position = 'fixed';
-        body.style.top = `-${scrollY}px`;
-        body.style.left = '0';
-        body.style.right = '0';
-        body.style.width = '100%';
-        body.style.overflow = 'hidden';
-        body.style.paddingRight = `${gutter}px`;
-
+        const unlock = lockPageScroll();
         const panel = panelRef.current;
         panel?.querySelector<HTMLButtonElement>('button')?.focus({ preventScroll: true });
-        if (panel !== null) {
-            const frame = readLayoutBox(panel);
-            if (frame.width >= 1 && frame.height >= 1) {
-                if (reduceMotion) {
-                    controls.set({ ...settledFlight, opacity: 0 });
-                    void controls.start({ opacity: 1, transition: { duration: 0.2 } });
-                } else {
-                    controls.set({ ...flightBetween(measureOriginRef.current(), frame), opacity: 1 });
-                    void controls.start({
-                        ...settledFlight,
-                        transition: { duration: expandDuration, ease: expandEase },
-                    });
-                }
-            }
-        }
 
         const onKeyDown = (event: KeyboardEvent) => {
             if (event.key === 'Escape') {
                 event.preventDefault();
-                requestCloseRef.current();
+                onCloseRef.current();
                 return;
             }
             if (event.key !== 'Tab' || panel === null) return;
@@ -327,92 +252,63 @@ function ExpandedCard({
 
         document.addEventListener('keydown', onKeyDown);
         return () => {
-            body.style.position = previous.position;
-            body.style.top = previous.top;
-            body.style.left = previous.left;
-            body.style.right = previous.right;
-            body.style.width = previous.width;
-            body.style.overflow = previous.overflow;
-            body.style.paddingRight = previous.paddingRight;
-            void document.documentElement.offsetHeight;
-            window.scrollTo({ top: scrollY, left: 0, behavior: 'instant' });
             document.removeEventListener('keydown', onKeyDown);
+            unlock();
         };
-    }, [controls, reduceMotion]);
-
-    const presenceExit = reduceMotion
-        ? { opacity: 0, transition: { duration: 0.2 } }
-        : { opacity: 1, transition: { duration: 0 } };
+    }, []);
 
     return (
-        <motion.div
-            className="fixed inset-0 z-[60]"
-            role="presentation"
-            initial={{ opacity: 1 }}
-            animate={{ opacity: 1 }}
-            exit={presenceExit}
-        >
+        <div className="fixed inset-0 z-[60] md:flex md:items-center md:justify-center md:p-6" role="presentation">
             <motion.div
                 aria-hidden="true"
-                className="absolute inset-0 cursor-pointer bg-black/40 backdrop-blur-md"
+                className="absolute inset-0 cursor-pointer bg-neutral-950/40 dark:bg-black/60"
                 initial={{ opacity: 0 }}
-                animate={{ opacity: closing ? 0 : 1 }}
-                exit={{ opacity: 0, transition: { duration: reduceMotion ? 0.2 : 0 } }}
-                transition={{ duration: reduceMotion ? 0.2 : closing ? expandDuration : 0.35, ease: expandEase }}
-                onClick={requestClose}
+                animate={{ opacity: 1, transition: { duration: 0.25, ease: 'easeOut' } }}
+                exit={{ opacity: 0, transition: { duration: 0.3, ease: 'easeIn' } }}
+                onClick={onClose}
             />
-            <motion.div
+            <div
                 ref={panelRef}
                 role="dialog"
                 aria-modal="true"
                 aria-label={face.title}
                 data-expanded-card
-                initial={false}
-                animate={controls}
-                exit={presenceExit}
-                style={{ originX: 0, originY: 0 }}
-                className={expandedPanelClass}
+                className="relative h-dvh w-full md:h-auto md:max-h-[calc(100dvh-3rem)] md:max-w-2xl"
             >
-                <div className="sticky top-0 z-10 flex h-0 justify-end overflow-visible">
+                <motion.div
+                    layoutId={shellId(face)}
+                    transition={shellSpring}
+                    className={`${shellClass} shadow-2xl dark:shadow-black/50`}
+                    style={{ borderRadius: 2 }}
+                />
+                <motion.div
+                    className="relative h-full overflow-y-auto overscroll-contain p-8 md:max-h-[calc(100dvh-3rem)] md:p-10"
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1, transition: contentIn }}
+                    exit={{ opacity: 0, transition: contentOut }}
+                >
                     <button
                         type="button"
-                        onClick={requestClose}
-                        className="relative top-3 right-3 rounded-full p-2 text-black transition-colors hover:bg-black/10 dark:text-white dark:hover:bg-white/10"
+                        onClick={onClose}
+                        className="absolute top-4 right-4 rounded-full p-2 text-neutral-500 transition-colors hover:bg-black/5 hover:text-black dark:hover:bg-white/10 dark:hover:text-white"
                         aria-label="Close"
                     >
                         <X size={20} />
                     </button>
-                </div>
-                <div className="lg:grid lg:grid-cols-[minmax(0,1.35fr)_minmax(13rem,0.85fr)] lg:items-start">
-                        <div className="min-w-0 p-8 pr-14">
-                            <div className="mb-6 flex flex-wrap items-center gap-2">
-                                <span className="text-neutral-500 font-mono text-xs tracking-widest uppercase">
-                                    {face.eyebrow}
-                                </span>
-                                {face.status && (
-                                    <span className={`text-[10px] font-mono tracking-wider px-2 py-0.5 rounded-full border ${toneClass[face.status.tone]}`}>
-                                        {face.status.label}
-                                    </span>
-                                )}
-                            </div>
-                            <h3 className="mb-3 break-words text-xl font-bold tracking-tight text-neutral-900 dark:text-neutral-100 lg:text-2xl">
-                                {face.title}
-                            </h3>
-                            <p className="mb-6 text-sm font-light leading-relaxed text-neutral-600 dark:text-neutral-400">
-                                {face.summary}
-                            </p>
-                            <div className="flex flex-wrap gap-2 border-t border-neutral-200 pt-4 dark:border-white/5">
-                                {face.tags.map((tag) => (
-                                    <span key={tag} className="text-[10px] uppercase tracking-wider font-mono text-neutral-500">
-                                        {tag}
-                                    </span>
-                                ))}
-                            </div>
-                        </div>
-                        <MenuLinks face={face} onClose={onClose} />
+                    <div className="mb-6 pr-10">
+                        <CardHeading face={face} />
                     </div>
-            </motion.div>
-        </motion.div>
+                    <h3 className="mb-4 break-words text-2xl font-bold tracking-tight text-neutral-900 dark:text-neutral-100 md:text-3xl">
+                        {face.title}
+                    </h3>
+                    <p className="mb-6 text-base font-light leading-relaxed text-neutral-600 dark:text-neutral-400">
+                        {face.summary}
+                    </p>
+                    <CardTags face={face} />
+                    <MenuLinks face={face} onClose={onClose} />
+                </motion.div>
+            </div>
+        </div>
     );
 }
 
@@ -429,14 +325,16 @@ function ProjectCard({
     face,
     index,
     expanded,
-    concealed,
+    returning,
     onOpen,
+    onReturned,
 }: {
     face: CardFace;
     index: number;
     expanded: boolean;
-    concealed: boolean;
+    returning: boolean;
     onOpen: (face: CardFace, trigger: HTMLButtonElement) => void;
+    onReturned: () => void;
 }) {
     return (
         <motion.article
@@ -444,47 +342,49 @@ function ProjectCard({
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true, margin: '-50px' }}
             transition={{ duration: 0.5, delay: index * 0.1 }}
-            style={{ visibility: concealed ? 'hidden' : 'visible' }}
-            className="group h-full min-w-0 cursor-pointer"
+            // While the shell flies back it has to sit above the fading backdrop.
+            className={`group relative h-full min-w-0 cursor-pointer ${returning ? 'z-[70]' : ''}`}
         >
             <div
                 data-project-card
-                className="relative flex h-full min-w-0 flex-col bg-neutral-50 dark:bg-neutral-900/20 border border-neutral-200 dark:border-white/5 p-8 rounded-sm transition-[transform,box-shadow] duration-500 hover:-translate-y-1 hover:shadow-lg dark:hover:shadow-white/5 ring-1 ring-transparent hover:ring-black dark:hover:ring-white focus-within:ring-black dark:focus-within:ring-white"
+                className="relative h-full min-w-0 rounded-sm transition-[transform,box-shadow] duration-500 hover:-translate-y-1 hover:shadow-lg dark:hover:shadow-white/5 ring-1 ring-transparent hover:ring-black dark:hover:ring-white focus-within:ring-black dark:focus-within:ring-white"
             >
-            <CardOverlay face={face} expanded={expanded} onOpen={onOpen} />
-            <div className="flex justify-between items-start mb-6">
-                <div className="flex min-w-0 flex-wrap items-center gap-2">
-                    <span className="text-neutral-500 font-mono text-xs tracking-widest uppercase">
-                        {face.eyebrow}
-                    </span>
-                    {face.status && (
-                        <span className={`text-[10px] font-mono tracking-wider px-2 py-0.5 rounded-full border ${toneClass[face.status.tone]}`}>
-                            {face.status.label}
-                        </span>
-                    )}
-                </div>
-                <div className="flex gap-3 shrink-0">
-                    {cornerLinks(face).map((link) => (
-                        <CornerLink key={link.label} link={link} title={face.title} />
-                    ))}
-                </div>
-            </div>
+                {!expanded && (
+                    <motion.div
+                        layoutId={shellId(face)}
+                        transition={shellSpring}
+                        className={`${shellClass} dark:bg-neutral-900/20`}
+                        style={{ borderRadius: 2 }}
+                        onLayoutAnimationComplete={returning ? onReturned : undefined}
+                    />
+                )}
+                <motion.div
+                    className="relative flex h-full min-w-0 flex-col p-8"
+                    initial={false}
+                    animate={{ opacity: expanded ? 0 : 1, transition: expanded ? contentOut : contentIn }}
+                >
+                    <CardOverlay face={face} expanded={expanded} onOpen={onOpen} />
+                    <div className="flex justify-between items-start mb-6">
+                        <CardHeading face={face} />
+                        <div className="flex gap-3 shrink-0">
+                            {cornerLinks(face).map((link) => (
+                                <CornerLink key={link.label} link={link} title={face.title} />
+                            ))}
+                        </div>
+                    </div>
 
-            <h3 className="text-xl font-bold mb-3 break-words text-neutral-900 dark:text-neutral-100 group-hover:text-black dark:group-hover:text-white transition-colors">
-                {face.title}
-            </h3>
+                    <h3 className="text-xl font-bold mb-3 break-words text-neutral-900 dark:text-neutral-100 group-hover:text-black dark:group-hover:text-white transition-colors">
+                        {face.title}
+                    </h3>
 
-            <p className="text-sm text-neutral-600 dark:text-neutral-400 mb-6 font-light leading-relaxed flex-grow">
-                {face.summary}
-            </p>
+                    <p className="text-sm text-neutral-600 dark:text-neutral-400 mb-6 font-light leading-relaxed flex-grow">
+                        {face.summary}
+                    </p>
 
-            <div className="flex flex-wrap gap-2 mt-auto pt-4 border-t border-neutral-200 dark:border-white/5">
-                {face.tags.map((tag) => (
-                    <span key={tag} className="text-[10px] uppercase tracking-wider font-mono text-neutral-500">
-                        {tag}
-                    </span>
-                ))}
-            </div>
+                    <div className="mt-auto">
+                        <CardTags face={face} />
+                    </div>
+                </motion.div>
             </div>
         </motion.article>
     );
@@ -492,34 +392,24 @@ function ProjectCard({
 
 export default function Work() {
     const [open, setOpen] = useState<CardFace | null>(null);
-    const [concealedId, setConcealedId] = useState<string | null>(null);
+    const [returningId, setReturningId] = useState<string | null>(null);
     const triggerRef = useRef<HTMLButtonElement | null>(null);
     const closeMenu = useCallback(() => {
+        setReturningId(open?.id ?? null);
         setOpen(null);
-    }, []);
-    const pendingFocus = useRef(false);
+    }, [open]);
+    const clearReturning = useCallback(() => setReturningId(null), []);
     const finishClose = useCallback(() => {
-        pendingFocus.current = true;
-        setConcealedId(null);
-    }, []);
-    useLayoutEffect(() => {
-        if (!pendingFocus.current || concealedId !== null) return;
-        pendingFocus.current = false;
         const trigger = triggerRef.current;
         if (trigger?.isConnected) trigger.focus({ preventScroll: true });
-    }, [concealedId]);
+    }, []);
     const openMenu = useCallback((face: CardFace, trigger: HTMLButtonElement) => {
         triggerRef.current = trigger;
-        setConcealedId(face.id);
         setOpen(face);
-    }, []);
-    const measureOrigin = useCallback((): CardOrigin => {
-        const trigger = triggerRef.current;
-        if (trigger?.isConnected) return readCardOrigin(trigger);
-        return { top: 0, left: 0, width: 1, height: 1 };
     }, []);
 
     return (
+        <MotionConfig reducedMotion="user">
         <section id="work" className="py-32">
             {/* Experience (Timeline) */}
             <div className="mb-32">
@@ -634,18 +524,18 @@ export default function Work() {
                             face={face}
                             index={index}
                             expanded={open?.id === face.id}
-                            concealed={concealedId === face.id}
+                            returning={returningId === face.id}
                             onOpen={openMenu}
+                            onReturned={clearReturning}
                         />
                     ))}
                 </div>
                 <AnimatePresence onExitComplete={finishClose}>
-                    {open ? (
-                        <ExpandedCard key={open.id} face={open} measureOrigin={measureOrigin} onClose={closeMenu} />
-                    ) : null}
+                    {open ? <ExpandedCard key={open.id} face={open} onClose={closeMenu} /> : null}
                 </AnimatePresence>
             </div>
 
         </section>
+        </MotionConfig>
     );
 }

@@ -36,6 +36,7 @@ it('exposes the catalog faces in research-then-date order', () => {
     external: false,
   })
   expect(grpo.links).toEqual([
+    { label: 'Paper', href: '/assets/blog/chaudhry-2026-rl-or-data.pdf', external: true },
     { label: 'Code', href: 'https://github.com/LakshyaChaudhry/rl-or-data', external: true },
   ])
   expect(grpo.summary).toContain('does not close that gap')

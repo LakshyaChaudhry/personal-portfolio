@@ -117,3 +117,27 @@ it('returns the same face ids and hrefs for the same drafts', () => {
     'project-2026',
   ])
 })
+
+it('accepts an on-site PDF as a paper and rejects other site paths', () => {
+  const card = (paper: string) => ({
+    experience: [],
+    cards: [
+      {
+        id: 'hosted',
+        kind: 'research' as const,
+        title: 'Title',
+        summary: 'Summary',
+        tags: ['tag'] as const,
+        publishedOn: on('2026-01-01'),
+        paper: paper as '/assets/paper.pdf',
+      },
+    ],
+  })
+  expect(buildWork(card('/assets/blog/paper.pdf')).cardFaces[0]?.activation).toEqual({
+    label: 'Paper',
+    href: '/assets/blog/paper.pdf',
+    external: true,
+  })
+  expect(() => buildWork(card('/assets/blog/paper.png'))).toThrow("bad url on 'hosted'")
+  expect(() => buildWork(card('http://example.com/paper.pdf'))).toThrow("bad url on 'hosted'")
+})
