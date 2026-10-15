@@ -1,6 +1,5 @@
 import { expect, it } from 'vitest'
 import { cardFaces, experienceRows } from './projects'
-import { RL_OR_DATA_PAPER_URL } from '../content/papers'
 
 function face(id: string) {
   const found = cardFaces.find((item) => item.id === id)
@@ -37,7 +36,6 @@ it('exposes the catalog faces in research-then-date order', () => {
     external: false,
   })
   expect(grpo.links).toEqual([
-    { label: 'Paper', href: RL_OR_DATA_PAPER_URL, external: true },
     { label: 'Code', href: 'https://github.com/LakshyaChaudhry/rl-or-data', external: true },
   ])
   expect(grpo.summary).toContain('does not close that gap')
@@ -46,7 +44,8 @@ it('exposes the catalog faces in research-then-date order', () => {
 
   expect(face('res-beyond-lie-detection').activation.href).toBe('/blog/beyond-lie-detection')
   expect(face('res-sample-whitebox-af').activation.href).toBe('/blog/beyond-lie-detection')
-  expect(face('res-beyond-lie-detection').summary).toContain('+12% AUROC')
+  expect(face('res-beyond-lie-detection').summary).toContain('+28% AUROC')
+  expect(face('res-beyond-lie-detection').summary).toContain('+33% AUPRC')
   expect(face('res-beyond-lie-detection').status).toEqual({
     label: 'ICML 2026 TAIGR \u2014 accepted',
     tone: 'accepted',
