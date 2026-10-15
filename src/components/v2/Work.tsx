@@ -236,6 +236,8 @@ function ExpandedCard({ face, onClose }: { face: CardFace; onClose: () => void }
     const panelRef = useRef<HTMLDivElement>(null);
     // Once closing starts the overlay must not swallow clicks meant for the grid.
     const isPresent = useIsPresent();
+    // Rounded only where the panel floats; full-screen on phones stays square.
+    const [floating] = useState(() => window.matchMedia('(min-width: 768px)').matches);
     const onCloseRef = useRef(onClose);
     onCloseRef.current = onClose;
 
@@ -296,7 +298,7 @@ function ExpandedCard({ face, onClose }: { face: CardFace; onClose: () => void }
                     layoutId={shellId(face)}
                     transition={shellSpring}
                     className={`${shellClass} shadow-2xl dark:shadow-black/50`}
-                    style={{ borderRadius: 2 }}
+                    style={{ borderRadius: floating ? 12 : 0 }}
                 />
                 <motion.div
                     className="relative h-full overflow-y-auto overscroll-contain p-8 md:max-h-[calc(100dvh-3rem)] md:p-10"
