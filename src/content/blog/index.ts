@@ -5,6 +5,7 @@ import * as synthbench from './synthbench.mdx'
 import * as distill from './distill.mdx'
 import * as beyondLieDetection from './beyond-lie-detection.mdx'
 import * as ciscoAiDefense from './cisco-ai-defense.mdx'
+import * as rlOrData from './rl-or-data.mdx'
 
 export interface BlogPostMeta {
   slug: string
@@ -20,13 +21,24 @@ interface BlogPostModule {
   frontmatter: Omit<BlogPostMeta, 'slug'>
 }
 
-const postModules: Record<string, BlogPostModule> = {
-  'hello-world': helloWorld as unknown as BlogPostModule,
-  'signal-ai-coach': signalAiCoach as unknown as BlogPostModule,
-  'synthbench': synthbench as unknown as BlogPostModule,
-  'distill': distill as unknown as BlogPostModule,
-  'beyond-lie-detection': beyondLieDetection as unknown as BlogPostModule,
-  'cisco-ai-defense': ciscoAiDefense as unknown as BlogPostModule,
+function blogPost(mod: BlogPostModule): BlogPostModule {
+  return { default: mod.default, frontmatter: mod.frontmatter }
+}
+
+const postModules = {
+  'hello-world': blogPost(helloWorld),
+  'signal-ai-coach': blogPost(signalAiCoach),
+  synthbench: blogPost(synthbench),
+  distill: blogPost(distill),
+  'beyond-lie-detection': blogPost(beyondLieDetection),
+  'cisco-ai-defense': blogPost(ciscoAiDefense),
+  'rl-or-data': blogPost(rlOrData),
+}
+
+export type BlogSlug = keyof typeof postModules
+
+function isBlogSlug(slug: string): slug is BlogSlug {
+  return Object.prototype.hasOwnProperty.call(postModules, slug)
 }
 
 export function getAllPosts(): BlogPostMeta[] {
@@ -40,8 +52,9 @@ export function getAllPosts(): BlogPostMeta[] {
 }
 
 export function getPost(slug: string): { Component: ComponentType; meta: BlogPostMeta } | null {
+  if (!isBlogSlug(slug)) return null
   const mod = postModules[slug]
-  if (!mod || mod.frontmatter.published === false) return null
+  if (mod.frontmatter.published === false) return null
   return {
     Component: mod.default,
     meta: { slug, ...mod.frontmatter },

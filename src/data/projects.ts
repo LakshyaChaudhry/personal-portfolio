@@ -1,182 +1,210 @@
-export interface Project {
-    id: string;
-    title: string;
-    category: 'experience' | 'project' | 'research';
-    role?: string; // For timeline / research
-    period?: string; // For timeline / research
-    shortDescription: string;
-    fullDescription: string;
-    technologies: string[];
-    githubLink?: string;
-    paperLink?: string;
-    liveLink?: string;
-    imageUrl?: string;
-    color: string;
-    status?: 'in progress' | 'COLM 2026 under review' | 'ICML 2026 TAIGR — accepted' | 'ICML 2026 — accepted';
-    hidden?: boolean;
-};
+import { buildWork, on } from '../domain/cards'
+import type { CardDraft, ExperienceDraft } from '../domain/cards'
+import { RL_OR_DATA_PAPER_URL } from '../content/papers'
 
-export const projects: Project[] = [
-    // --- Experience ---
-    {
-        id: 'exp-mars',
-        title: "Cambridge AI Safety Hub",
-        category: 'experience',
-        role: "AI Research Fellow, MARS 5.0",
-        period: "Jun 2026 – Present",
-        shortDescription: "Selected as a MARS 5.0 Research Fellow; researching AI control & security under Lindley Lentati, Ph.D.",
-        fullDescription: "Selected as a MARS 5.0 Research Fellow at the Cambridge AI Safety Hub. Working under Lindley Lentati, Ph.D on AI control and security research. Based in Oxford, England.",
-        technologies: ["AI Control", "AI Security", "Alignment"],
-        color: "from-violet-500 to-purple-600",
-    },
-    {
-        id: 'exp-0',
-        title: "Cisco",
-        category: 'experience',
-        role: "AI/ML Engineering Intern",
-        period: "Summer 2026",
-        shortDescription: "Incoming AI/ML Engineering Intern.",
-        fullDescription: "Incoming AI/ML Engineering Intern at Cisco.",
-        technologies: ["AI/ML"],
-        color: "from-blue-600 to-cyan-500",
-    },
-    {
-        id: 'exp-1',
-        title: "TrustCircle",
-        category: 'experience',
-        role: "AI/ML Research Intern",
-        period: "May 2025 – Aug 2025",
-        shortDescription: "Built production-ready RAG for emotional-support retrieval.",
-        fullDescription: "Built a production-ready RAG for emotional-support retrieval (AI-powered recommendation system that matches students with mental health resources) using OpenAI embeddings + MongoDB Atlas vector search.",
-        technologies: ["OpenAI", "MongoDB Atlas", "RAG", "Vector Search"],
-        color: "from-blue-500 to-cyan-600",
-    },
-    {
-        id: 'exp-2',
-        title: "Perplexity AI",
-        category: 'experience',
-        role: "Campus Strategist",
-        period: "Jan 2025 – May 2025",
-        shortDescription: "Drove 15,000+ new student registrations.",
-        fullDescription: "Selected as 1 of 2 Campus Strategists at Purdue University; drove 15,000+ new student registrations by building ambassador network across the Midwest region and executing data-driven growth campaigns.",
-        technologies: ["Growth Strategy", "Data Analysis", "Campaign Management"],
-        color: "from-teal-500 to-emerald-600",
-    },
-    {
-        id: 'exp-3',
-        title: "Corteva Agriscience",
-        category: 'experience',
-        role: "AI/LLM Engineer + Researcher",
-        period: "Aug 2024 – May 2025",
-        shortDescription: "Engineered proprietary PDF extraction and hybrid RAG.",
-        fullDescription: "Engineered proprietary PDF extraction and hybrid RAG (vector + graph context) for crop-protection Labels/SDS; benchmarked open- and closed-source tools.",
-        technologies: ["Azure Doc Intel", "Hybrid RAG", "React", "Graph DB"],
-        color: "from-orange-500 to-red-600",
-    },
-    {
-        id: 'exp-4',
-        title: "TrustCircle",
-        category: 'experience',
-        role: "Software Engineer Intern",
-        period: "May 2024 – Aug 2024",
-        shortDescription: "Integrated OpenAI LLMs into student well-being platform.",
-        fullDescription: "Integrated OpenAI LLMs (GPT-4o via Microsoft Azure, FERPA/COPPA compliant) into student well-being platform to analyze unstructured data from counselor notes/logs and identify students at risk.",
-        technologies: ["GPT-4o", "Azure", "Compliance", "NLP"],
-        color: "from-blue-500 to-indigo-600",
-    },
+const experience = [
+  {
+    id: "exp-mars",
+    title: "Cambridge AI Safety Hub",
+    role: "AI Research Fellow, MARS 5.0",
+    period: "Jun 2026 – Present",
+    tags: [
+      "AI Control",
+      "AI Security",
+      "Alignment",
+    ],
+  },
+  {
+    id: "exp-0",
+    title: "Cisco",
+    role: "AI/ML Engineering Intern",
+    period: "Summer 2026",
+    tags: [
+      "AI/ML",
+    ],
+  },
+  {
+    id: "exp-1",
+    title: "TrustCircle",
+    role: "AI/ML Research Intern",
+    period: "May 2025 – Aug 2025",
+    tags: [
+      "OpenAI",
+      "MongoDB Atlas",
+      "RAG",
+      "Vector Search",
+    ],
+  },
+  {
+    id: "exp-2",
+    title: "Perplexity AI",
+    role: "Campus Strategist",
+    period: "Jan 2025 – May 2025",
+    tags: [
+      "Growth Strategy",
+      "Data Analysis",
+      "Campaign Management",
+    ],
+  },
+  {
+    id: "exp-3",
+    title: "Corteva Agriscience",
+    role: "AI/LLM Engineer + Researcher",
+    period: "Aug 2024 – May 2025",
+    tags: [
+      "Azure Doc Intel",
+      "Hybrid RAG",
+      "React",
+      "Graph DB",
+    ],
+  },
+  {
+    id: "exp-4",
+    title: "TrustCircle",
+    role: "Software Engineer Intern",
+    period: "May 2024 – Aug 2024",
+    tags: [
+      "GPT-4o",
+      "Azure",
+      "Compliance",
+      "NLP",
+    ],
+  },
+] as const satisfies readonly ExperienceDraft[]
 
-    // --- Projects & Research ---
-    // Row 1: Research
-    {
-        id: 'res-beyond-lie-detection',
-        title: "Beyond Lie Detection: Sample-Level White-Box Auditing of Alignment Faking",
-        category: 'research',
-        role: "Mechanistic Interpretability Researcher",
-        period: "Sep 2025 – Present",
-        shortDescription: "Introduced a per-rollout labeling procedure separating alignment faking from plain lying and situational awareness. Probes trained on controlled synthetic AF data gain +12% AUROC and +15% AUPRC over existing lie-detection baselines.",
-        fullDescription: "Introduced a per-rollout labeling procedure that separates alignment faking (correct output, concealed misalignment) from plain lying and situational awareness across four datasets and four Llama-3-70B model organisms (HAL9000, Pacifist). Showed existing deception probes have mixed transfer to AF, while probes trained on a targeted synthetic Animal Protection AF dataset gain +12% AUROC and +15% AUPRC on average. [Algoverse AI (Blue Team) x Redwood Research (Red Team)]",
-        technologies: ["Mechanistic Interpretability", "Linear Probes", "PyTorch", "TransformerLens"],
-        githubLink: "https://github.com/LakshyaChaudhry/bench-af",
-        color: "from-purple-500 to-violet-600",
-        status: 'ICML 2026 TAIGR — accepted',
-    },
-    {
-        id: 'res-sample-whitebox-af',
-        title: "Sample-Level White-Box Detection of Alignment Faking",
-        category: 'research',
-        role: "Mechanistic Interpretability Researcher",
-        period: "Sep 2025 – Present",
-        shortDescription: "First systematic study of sample-level white-box AF detection. Shows truth probe directions drift substantially across fine-tuning lineage (+0.15–0.40 cosine similarity drop), motivating within-model probing for reliable detection.",
-        fullDescription: "First systematic study posing sample-level white-box alignment faking detection as a distinct problem. Beyond probe training data, we show that truth-relevant probe directions drift substantially across a model's fine-tuning lineage — with cosine similarity gaps of 0.15–0.40 — significantly degrading cross-model transfer and motivating within-model probing. Extends the accepted TAIGR paper with a full section on truth representation geometry drift across four models in a shared Llama-3-70B lineage. [Algoverse AI (Blue Team) x Redwood Research (Red Team)]",
-        technologies: ["Mechanistic Interpretability", "Linear Probes", "PyTorch", "TransformerLens"],
-        githubLink: "https://github.com/LakshyaChaudhry/bench-af",
-        color: "from-indigo-500 to-violet-700",
-        status: 'ICML 2026 — accepted',
-    },
-    {
-        id: 'res-colm',
-        title: "Don't Make the LLM Read the Graph — Make the Graph Think",
-        category: 'research',
-        role: "Multi-Agent Cooperation Research",
-        period: "Nov 2025 – Present",
-        shortDescription: "Investigating whether belief graphs improve LLM cooperation in Hanabi across 3,000+ trials and four model families. Identified \"Planner Defiance\" — a novel failure mode where LLMs override correct graph recommendations. Under review at COLM 2026.",
-        fullDescription: "Investigating whether belief graphs improve LLM cooperation in Hanabi across 3,000+ trials and four model families. Identified \"Planner Defiance\" — a novel failure mode where LLMs override correct graph recommendations. Under review at COLM 2026.",
-        technologies: ["Multi-Agent", "Hanabi", "Belief Graphs", "LLM Reasoning"],
-        paperLink: "https://openreview.net/forum?id=y3TtQFiodt",
-        color: "from-pink-500 to-rose-600",
-        status: 'COLM 2026 under review',
-    },
-    // Row 2: Distill + SynthBench
-    {
-        id: 'proj-distill',
-        title: "Distill",
-        category: 'project',
-        shortDescription: "Agentic CLI that turns arXiv papers into structured, linked Obsidian notes using a 6-tool pipeline orchestrated by Claude's tool-calling API.",
-        fullDescription: "Agentic CLI that turns arXiv papers into structured, linked Obsidian notes using a 6-tool pipeline orchestrated by Claude's tool-calling API. Parses PDFs via Azure Document Intelligence, generates structured digests, identifies research gaps, and auto-links concepts to an existing Obsidian knowledge graph.",
-        technologies: ["Agents", "Azure Doc Intel", "Python", "CLI"],
-        liveLink: "/blog/distill",
-        color: "from-neutral-500 to-neutral-700",
-    },
-    {
-        id: 'proj-synthbench',
-        title: "SynthBench",
-        category: 'project',
-        shortDescription: "Benchmarking text-to-image synthetic data vs. traditional augmentation for zero-shot visual classification. Achieved 81% accuracy with zero real training examples.",
-        fullDescription: "Benchmarking text-to-image synthetic data vs. traditional augmentation for zero-shot visual classification. Achieved 81% accuracy with zero real training examples.",
-        technologies: ["Computer Vision", "Synthetic Data", "Zero-Shot", "PyTorch"],
-        liveLink: "/blog/synthbench",
-        color: "from-neutral-500 to-neutral-700",
-    },
-    // Row 3: Signal + Corteva
-    {
-        id: 'proj-signal',
-        title: "Signal",
-        category: 'project',
-        shortDescription: "Brutalist productivity tracker with a locally fine-tuned AI coach, trained on personal behavioral data and productivity literature. Runs entirely on Apple Silicon.",
-        fullDescription: "A brutalist productivity tracker with a locally fine-tuned Llama 3.1 8B AI coach. Trained on 1,442 examples combining productivity literature and 70 days of personal behavioral logs. The entire stack—training, serving, inference—runs on a single M3 Ultra Mac Studio.",
-        technologies: ["MLX", "Llama", "Finetuning", "Data Synthesis"],
-        liveLink: "/blog/signal-ai-coach",
-        color: "from-neutral-500 to-neutral-700",
-    },
-    {
-        id: 'proj-2',
-        title: "Corteva SDS & Label Extractor LLM",
-        category: 'project',
-        shortDescription: "Contracted by Corteva Agriscience to engineer a proprietary hybrid RAG system (Vector + Graph) for crop-protection data, improving research efficiency by ~80%.",
-        fullDescription: "Contracted by Corteva Agriscience to engineer a proprietary PDF extraction and hybrid RAG system for crop-protection Labels and Safety Data Sheets. The system utilized vector and graph-aware reranking to index ~300k pages, delivering real-time answers and reducing research time from hours to sub-seconds for chemical formulation scientists.",
-        technologies: ["Hybrid RAG", "Azure Doc Intel", "React", "Graph DB"],
-        githubLink: "https://github.com/LakshyaChaudhry",
-        color: "from-orange-500 to-red-600",
-    },
-    // Row 4: Portfolio
-    {
-        id: 'proj-1',
-        title: "Portfolio",
-        category: 'project',
-        shortDescription: "Minimalist portfolio with dark mode",
-        fullDescription: "A modern, responsive portfolio website built with React, TypeScript, and Tailwind CSS. Features include dark/light mode toggle, smooth animations with Framer Motion, and a clean minimalist design.",
-        technologies: ["React", "TypeScript", "Tailwind CSS", "Framer Motion"],
-        githubLink: "https://github.com/LakshyaChaudhry/personal-portfolio",
-        color: "from-green-500 to-emerald-600",
-    },
-];
+const cards = [
+  {
+    id: "res-rl-or-data",
+    kind: "research",
+    title: "Is It RL or Data? A Controlled Comparison of GRPO and Rejection-Sampling Fine-Tuning",
+    summary: "On a counting task where every answer can be checked, GRPO beats rejection-sampling fine-tuning by about 8–11 points even when both methods see the same prompts and the same checker. Giving the supervised method the prompts GRPO actually learns from does not close that gap.",
+    tags: [
+      "GRPO",
+      "RFT",
+      "Post-training",
+      "Qwen3",
+    ],
+    status: { kind: 'preprint' },
+    writeup: "rl-or-data",
+    paper: RL_OR_DATA_PAPER_URL,
+    code: "https://github.com/LakshyaChaudhry/rl-or-data",
+  },
+  {
+    id: "res-beyond-lie-detection",
+    kind: "research",
+    title: "Beyond Lie Detection: Sample-Level White-Box Auditing of Alignment Faking",
+    summary: "Introduced a per-rollout labeling procedure separating alignment faking from plain lying and situational awareness. Probes trained on controlled synthetic AF data gain +28% AUROC and +33% AUPRC over existing lie-detection baselines.",
+    tags: [
+      "Mechanistic Interpretability",
+      "Linear Probes",
+      "PyTorch",
+      "TransformerLens",
+    ],
+    status: { kind: 'accepted', venue: 'ICML 2026 TAIGR' },
+    writeup: "beyond-lie-detection",
+    code: "https://github.com/LakshyaChaudhry/bench-af",
+  },
+  {
+    id: "res-sample-whitebox-af",
+    kind: "research",
+    title: "Sample-Level White-Box Detection of Alignment Faking",
+    summary: "First systematic study of sample-level white-box AF detection. Shows truth probe directions drift substantially across fine-tuning lineage (+0.15–0.40 cosine similarity drop), motivating within-model probing for reliable detection.",
+    tags: [
+      "Mechanistic Interpretability",
+      "Linear Probes",
+      "PyTorch",
+      "TransformerLens",
+    ],
+    status: { kind: 'accepted', venue: 'ICML 2026' },
+    writeup: "beyond-lie-detection",
+    code: "https://github.com/LakshyaChaudhry/bench-af",
+  },
+  {
+    id: "res-colm",
+    kind: "research",
+    title: "Don't Make the LLM Read the Graph — Make the Graph Think",
+    summary: "Investigating whether belief graphs improve LLM cooperation in Hanabi across 3,000+ trials and four model families. Identified \"Planner Defiance\" — a novel failure mode where LLMs override correct graph recommendations. Under review at COLM 2026.",
+    tags: [
+      "Multi-Agent",
+      "Hanabi",
+      "Belief Graphs",
+      "LLM Reasoning",
+    ],
+    status: { kind: 'under-review', venue: 'COLM 2026' },
+    publishedOn: on('2025-11-01'),
+    paper: "https://openreview.net/forum?id=y3TtQFiodt",
+  },
+  {
+    id: "proj-distill",
+    kind: "project",
+    title: "Distill",
+    summary: "Agentic CLI that turns arXiv papers into structured, linked Obsidian notes using a 6-tool pipeline orchestrated by Claude's tool-calling API.",
+    tags: [
+      "Agents",
+      "Azure Doc Intel",
+      "Python",
+      "CLI",
+    ],
+    writeup: "distill",
+    code: "https://github.com/LakshyaChaudhry/Distill",
+  },
+  {
+    id: "proj-synthbench",
+    kind: "project",
+    title: "SynthBench",
+    summary: "Benchmarking text-to-image synthetic data vs. traditional augmentation for zero-shot visual classification. Achieved 81% accuracy with zero real training examples.",
+    tags: [
+      "Computer Vision",
+      "Synthetic Data",
+      "Zero-Shot",
+      "PyTorch",
+    ],
+    writeup: "synthbench",
+    code: "https://github.com/LakshyaChaudhry/SynthBench",
+  },
+  {
+    id: "proj-signal",
+    kind: "project",
+    title: "Signal",
+    summary: "Brutalist productivity tracker with a locally fine-tuned AI coach, trained on personal behavioral data and productivity literature. Runs entirely on Apple Silicon.",
+    tags: [
+      "MLX",
+      "Llama",
+      "Finetuning",
+      "Data Synthesis",
+    ],
+    writeup: "signal-ai-coach",
+  },
+  {
+    id: "proj-2",
+    kind: "project",
+    title: "Corteva SDS & Label Extractor LLM",
+    summary: "Contracted by Corteva Agriscience to engineer a proprietary hybrid RAG system (Vector + Graph) for crop-protection data, improving research efficiency by ~80%.",
+    tags: [
+      "Hybrid RAG",
+      "Azure Doc Intel",
+      "React",
+      "Graph DB",
+    ],
+    publishedOn: on('2025-05-01'),
+    code: "https://github.com/LakshyaChaudhry",
+  },
+  {
+    id: "proj-1",
+    kind: "project",
+    title: "Portfolio",
+    summary: "Minimalist portfolio with dark mode",
+    tags: [
+      "React",
+      "TypeScript",
+      "Tailwind CSS",
+      "Framer Motion",
+    ],
+    publishedOn: on('2024-08-01'),
+    code: "https://github.com/LakshyaChaudhry/personal-portfolio",
+  },
+] as const satisfies readonly CardDraft[]
+
+export const { experienceRows, cardFaces } = buildWork({ experience, cards })
+
+export type { CardFace, CardLink, ExperienceRow } from '../domain/cards'

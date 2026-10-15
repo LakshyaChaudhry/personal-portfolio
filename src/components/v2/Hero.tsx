@@ -75,7 +75,7 @@ export default function Hero() {
                     Building elegant solutions to complex problems.
                 </p>
                 <p className="text-xl md:text-2xl font-light text-neutral-400">
-                    AI @ Purdue <span className="text-neutral-600">|</span> AI Safety Research
+                    Alignment research and applied systems
                 </p>
             </motion.div>
         </section>
