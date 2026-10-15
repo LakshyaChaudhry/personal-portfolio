@@ -127,15 +127,6 @@ function flightBetween(origin: CardOrigin, frame: CardOrigin): Flight {
     };
 }
 
-function sameFlight(a: Flight, b: Flight): boolean {
-    return (
-        Math.abs(a.x - b.x) < 0.5 &&
-        Math.abs(a.y - b.y) < 0.5 &&
-        Math.abs(a.scaleX - b.scaleX) < 0.002 &&
-        Math.abs(a.scaleY - b.scaleY) < 0.002
-    );
-}
-
 const expandedPanelClass =
     'fixed overflow-y-auto rounded-sm border border-neutral-200 bg-neutral-50 text-neutral-900 shadow-lg dark:border-white/5 dark:bg-neutral-900 dark:text-neutral-100 dark:shadow-white/5 inset-0 h-dvh w-full md:inset-auto md:top-6 md:right-auto md:bottom-auto md:left-[max(1rem,calc((100vw-min(52rem,100vw-2rem))/2))] md:h-auto md:max-h-[calc(100dvh-3rem)] md:w-[min(52rem,calc(100vw-2rem))]';
 
@@ -234,49 +225,57 @@ function ExpandedCard({
     onClose: () => void;
 }) {
     const panelRef = useRef<HTMLDivElement>(null);
+    const closingRef = useRef(false);
     const reduceMotion = useReducedMotion();
     const controls = useAnimationControls();
-    const [exitFlight, setExitFlight] = useState<Flight>(settledFlight);
+    const [closing, setClosing] = useState(false);
     const measureOriginRef = useRef(measureOrigin);
     measureOriginRef.current = measureOrigin;
+
+    const requestClose = useCallback(() => {
+        if (closingRef.current) return;
+        closingRef.current = true;
+        const panel = panelRef.current;
+        if (reduceMotion || panel === null) {
+            onClose();
+            return;
+        }
+        const frame = readLayoutBox(panel);
+        const flight = flightBetween(measureOriginRef.current(), frame);
+        panel.style.top = `${frame.top}px`;
+        panel.style.left = `${frame.left}px`;
+        panel.style.width = `${frame.width}px`;
+        panel.style.height = `${frame.height}px`;
+        panel.style.maxHeight = 'none';
+        panel.style.overflow = 'hidden';
+        setClosing(true);
+        void controls
+            .start({
+                x: flight.x,
+                y: flight.y,
+                scaleX: flight.scaleX,
+                scaleY: flight.scaleY,
+                opacity: 1,
+                transition: { duration: expandDuration, ease: expandEase },
+            })
+            .then(() => onClose());
+    }, [controls, onClose, reduceMotion]);
 
     useLayoutEffect(() => {
         const panel = panelRef.current;
         if (panel === null) return;
-        let started = false;
-
-        const syncFlight = (startAnimation: boolean) => {
-            const frame = readLayoutBox(panel);
-            if (frame.width < 1 || frame.height < 1) return;
-            const next = flightBetween(measureOriginRef.current(), frame);
-            setExitFlight((current) => (sameFlight(current, next) ? current : next));
-            if (!startAnimation || started) return;
-            started = true;
-            if (reduceMotion) {
-                controls.set({ ...settledFlight, opacity: 0 });
-                void controls.start({ opacity: 1, transition: { duration: 0.2 } });
-                return;
-            }
-            controls.set(next);
-            void controls.start({
-                ...settledFlight,
-                transition: { duration: expandDuration, ease: expandEase },
-            });
-        };
-
-        syncFlight(true);
-        const onResize = () => syncFlight(false);
-        window.addEventListener('resize', onResize);
-        const observer = new ResizeObserver(onResize);
-        observer.observe(panel);
-        const source = panel.ownerDocument.querySelector('[data-project-card]');
-        const concealed = document.querySelector('#projects article.opacity-0 [data-project-card]');
-        if (concealed instanceof HTMLElement) observer.observe(concealed);
-        else if (source instanceof HTMLElement) observer.observe(source);
-        return () => {
-            window.removeEventListener('resize', onResize);
-            observer.disconnect();
-        };
+        const frame = readLayoutBox(panel);
+        if (frame.width < 1 || frame.height < 1) return;
+        if (reduceMotion) {
+            controls.set({ ...settledFlight, opacity: 0 });
+            void controls.start({ opacity: 1, transition: { duration: 0.2 } });
+            return;
+        }
+        controls.set({ ...flightBetween(measureOriginRef.current(), frame), opacity: 1 });
+        void controls.start({
+            ...settledFlight,
+            transition: { duration: expandDuration, ease: expandEase },
+        });
     }, [controls, reduceMotion]);
 
     useEffect(() => {
@@ -288,7 +287,7 @@ function ExpandedCard({
         const onKeyDown = (event: KeyboardEvent) => {
             if (event.key === 'Escape') {
                 event.preventDefault();
-                onClose();
+                requestClose();
                 return;
             }
             if (event.key !== 'Tab' || panel === null) return;
@@ -310,9 +309,11 @@ function ExpandedCard({
             document.body.style.overflow = previousOverflow;
             document.removeEventListener('keydown', onKeyDown);
         };
-    }, [onClose]);
+    }, [requestClose]);
 
-    const exit = reduceMotion ? { ...settledFlight, opacity: 0 } : exitFlight;
+    const presenceExit = reduceMotion
+        ? { opacity: 0, transition: { duration: 0.2 } }
+        : { opacity: 1, transition: { duration: 0 } };
 
     return (
         <motion.div
@@ -320,17 +321,16 @@ function ExpandedCard({
             role="presentation"
             initial={{ opacity: 1 }}
             animate={{ opacity: 1 }}
-            exit={{ opacity: 1 }}
-            transition={{ duration: reduceMotion ? 0.2 : expandDuration }}
+            exit={presenceExit}
         >
             <motion.div
                 aria-hidden="true"
                 className="absolute inset-0 cursor-pointer bg-black/40 backdrop-blur-md"
                 initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                exit={{ opacity: 0 }}
-                transition={{ duration: reduceMotion ? 0 : 0.35 }}
-                onClick={onClose}
+                animate={{ opacity: closing ? 0 : 1 }}
+                exit={{ opacity: 0, transition: { duration: reduceMotion ? 0.2 : 0 } }}
+                transition={{ duration: reduceMotion ? 0.2 : closing ? expandDuration : 0.35, ease: expandEase }}
+                onClick={requestClose}
             />
             <motion.div
                 ref={panelRef}
@@ -340,14 +340,14 @@ function ExpandedCard({
                 data-expanded-card
                 initial={false}
                 animate={controls}
-                exit={exit}
+                exit={presenceExit}
                 style={{ originX: 0, originY: 0 }}
                 className={expandedPanelClass}
             >
                 <div className="sticky top-0 z-10 flex h-0 justify-end overflow-visible">
                     <button
                         type="button"
-                        onClick={onClose}
+                        onClick={requestClose}
                         className="relative top-3 right-3 rounded-full p-2 text-black transition-colors hover:bg-black/10 dark:text-white dark:hover:bg-white/10"
                         aria-label="Close"
                     >
@@ -415,11 +415,12 @@ function ProjectCard({
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true, margin: '-50px' }}
             transition={{ duration: 0.5, delay: index * 0.1 }}
-            className={`group h-full min-w-0 cursor-pointer ${concealed ? 'pointer-events-none opacity-0' : ''}`}
+            style={{ visibility: concealed ? 'hidden' : 'visible' }}
+            className="group h-full min-w-0 cursor-pointer"
         >
             <div
                 data-project-card
-                className="relative flex h-full min-w-0 flex-col bg-neutral-50 dark:bg-neutral-900/20 border border-neutral-200 dark:border-white/5 p-8 rounded-sm transition-all duration-500 hover:-translate-y-1 hover:shadow-lg dark:hover:shadow-white/5 ring-1 ring-transparent hover:ring-black dark:hover:ring-white focus-within:ring-black dark:focus-within:ring-white"
+                className="relative flex h-full min-w-0 flex-col bg-neutral-50 dark:bg-neutral-900/20 border border-neutral-200 dark:border-white/5 p-8 rounded-sm transition-[transform,box-shadow] duration-500 hover:-translate-y-1 hover:shadow-lg dark:hover:shadow-white/5 ring-1 ring-transparent hover:ring-black dark:hover:ring-white focus-within:ring-black dark:focus-within:ring-white"
             >
             <CardOverlay face={face} expanded={expanded} onOpen={onOpen} />
             <div className="flex justify-between items-start mb-6">
