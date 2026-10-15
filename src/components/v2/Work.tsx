@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react';
+import { useCallback, useLayoutEffect, useRef, useState } from 'react';
 import { AnimatePresence, motion, useAnimationControls, useReducedMotion } from 'framer-motion';
 import { Link } from 'react-router-dom';
 import { ArrowUpRight, FileText, Github, X } from 'lucide-react';
@@ -261,33 +261,54 @@ function ExpandedCard({
             .then(() => onClose());
     }, [controls, onClose, reduceMotion]);
 
-    useLayoutEffect(() => {
-        const panel = panelRef.current;
-        if (panel === null) return;
-        const frame = readLayoutBox(panel);
-        if (frame.width < 1 || frame.height < 1) return;
-        if (reduceMotion) {
-            controls.set({ ...settledFlight, opacity: 0 });
-            void controls.start({ opacity: 1, transition: { duration: 0.2 } });
-            return;
-        }
-        controls.set({ ...flightBetween(measureOriginRef.current(), frame), opacity: 1 });
-        void controls.start({
-            ...settledFlight,
-            transition: { duration: expandDuration, ease: expandEase },
-        });
-    }, [controls, reduceMotion]);
+    const requestCloseRef = useRef(requestClose);
+    requestCloseRef.current = requestClose;
+    const lockedScroll = useRef<number | null>(null);
 
-    useEffect(() => {
-        const previousOverflow = document.body.style.overflow;
-        document.body.style.overflow = 'hidden';
+    useLayoutEffect(() => {
+        const body = document.body;
+        if (lockedScroll.current === null) lockedScroll.current = window.scrollY;
+        const scrollY = lockedScroll.current;
+        const gutter = window.innerWidth - document.documentElement.clientWidth;
+        const previous = {
+            position: body.style.position,
+            top: body.style.top,
+            left: body.style.left,
+            right: body.style.right,
+            width: body.style.width,
+            overflow: body.style.overflow,
+            paddingRight: body.style.paddingRight,
+        };
+        body.style.position = 'fixed';
+        body.style.top = `-${scrollY}px`;
+        body.style.left = '0';
+        body.style.right = '0';
+        body.style.width = '100%';
+        body.style.overflow = 'hidden';
+        body.style.paddingRight = `${gutter}px`;
+
         const panel = panelRef.current;
-        panel?.querySelector<HTMLButtonElement>('button')?.focus();
+        panel?.querySelector<HTMLButtonElement>('button')?.focus({ preventScroll: true });
+        if (panel !== null) {
+            const frame = readLayoutBox(panel);
+            if (frame.width >= 1 && frame.height >= 1) {
+                if (reduceMotion) {
+                    controls.set({ ...settledFlight, opacity: 0 });
+                    void controls.start({ opacity: 1, transition: { duration: 0.2 } });
+                } else {
+                    controls.set({ ...flightBetween(measureOriginRef.current(), frame), opacity: 1 });
+                    void controls.start({
+                        ...settledFlight,
+                        transition: { duration: expandDuration, ease: expandEase },
+                    });
+                }
+            }
+        }
 
         const onKeyDown = (event: KeyboardEvent) => {
             if (event.key === 'Escape') {
                 event.preventDefault();
-                requestClose();
+                requestCloseRef.current();
                 return;
             }
             if (event.key !== 'Tab' || panel === null) return;
@@ -297,19 +318,27 @@ function ExpandedCard({
             if (first === undefined || last === undefined) return;
             if (event.shiftKey && document.activeElement === first) {
                 event.preventDefault();
-                last.focus();
+                last.focus({ preventScroll: true });
             } else if (!event.shiftKey && document.activeElement === last) {
                 event.preventDefault();
-                first.focus();
+                first.focus({ preventScroll: true });
             }
         };
 
         document.addEventListener('keydown', onKeyDown);
         return () => {
-            document.body.style.overflow = previousOverflow;
+            body.style.position = previous.position;
+            body.style.top = previous.top;
+            body.style.left = previous.left;
+            body.style.right = previous.right;
+            body.style.width = previous.width;
+            body.style.overflow = previous.overflow;
+            body.style.paddingRight = previous.paddingRight;
+            void document.documentElement.offsetHeight;
+            window.scrollTo({ top: scrollY, left: 0, behavior: 'instant' });
             document.removeEventListener('keydown', onKeyDown);
         };
-    }, [requestClose]);
+    }, [controls, reduceMotion]);
 
     const presenceExit = reduceMotion
         ? { opacity: 0, transition: { duration: 0.2 } }
@@ -477,7 +506,7 @@ export default function Work() {
         if (!pendingFocus.current || concealedId !== null) return;
         pendingFocus.current = false;
         const trigger = triggerRef.current;
-        if (trigger?.isConnected) trigger.focus();
+        if (trigger?.isConnected) trigger.focus({ preventScroll: true });
     }, [concealedId]);
     const openMenu = useCallback((face: CardFace, trigger: HTMLButtonElement) => {
         triggerRef.current = trigger;
