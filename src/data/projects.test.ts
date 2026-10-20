@@ -59,10 +59,14 @@ it('exposes the catalog faces in research-then-date order', () => {
   })
 
   const colm = face('res-colm')
+  expect(colm.title).toBe("Don't Make the LLM Read the Graph: Make the Graph Think")
+  expect(colm.summary).toBe(
+    'Investigating whether belief graphs improve LLM cooperation in Hanabi across 3,000+ trials and four model families. Identified "Planner Defiance", a novel failure mode where LLMs override correct graph recommendations.',
+  )
   expect(colm.activation.label).toBe('Paper')
-  expect(colm.activation.href).toBe('https://openreview.net/forum?id=y3TtQFiodt')
+  expect(colm.activation.href).toBe('https://arxiv.org/abs/2604.23057')
   expect(colm.links).toHaveLength(0)
-  expect(colm.status).toEqual({ label: 'COLM 2026 under review', tone: 'review' })
+  expect(colm.status).toEqual({ label: 'Preprint', tone: 'sky' })
 
   const signal = face('proj-signal')
   expect(signal.activation.label).toBe('Writeup')
