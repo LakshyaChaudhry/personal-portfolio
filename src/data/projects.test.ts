@@ -36,10 +36,12 @@ it('exposes the catalog faces in research-then-date order', () => {
     external: false,
   })
   expect(grpo.links).toEqual([
-    { label: 'Paper', href: '/assets/blog/chaudhry-2026-rl-or-data.pdf', external: true },
+    { label: 'Paper', href: 'https://arxiv.org/abs/2610.25812', external: true },
     { label: 'Code', href: 'https://github.com/LakshyaChaudhry/rl-or-data', external: true },
   ])
-  expect(grpo.summary).toContain('does not close that gap')
+  expect(grpo.title).toBe('Is it RL or Data? A Controlled Comparison of GRPO and Rejection-Sampling Fine-Tuning')
+  expect(grpo.summary).toContain('10.9 points')
+  expect(grpo.summary).toContain('about 30%')
   expect(grpo.status).toEqual({ label: 'Preprint', tone: 'sky' })
   expect(grpo.tags).toEqual(['GRPO', 'RFT', 'Post-training', 'Qwen3'])
 

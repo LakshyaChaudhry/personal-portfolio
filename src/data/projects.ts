@@ -76,8 +76,8 @@ const cards = [
   {
     id: "res-rl-or-data",
     kind: "research",
-    title: "Is It RL or Data? A Controlled Comparison of GRPO and Rejection-Sampling Fine-Tuning",
-    summary: "On a counting task where every answer can be checked, GRPO beats rejection-sampling fine-tuning by about 8–11 points even when both methods see the same prompts and the same checker. Giving the supervised method the prompts GRPO actually learns from does not close that gap.",
+    title: "Is it RL or Data? A Controlled Comparison of GRPO and Rejection-Sampling Fine-Tuning",
+    summary: "GRPO beats a tuned rejection-sampling baseline by 10.9 points on held-out test problems with curated prompts. Iterated rejection-sampling fine-tuning, which resamples from the current policy, recovers about 30% of that gap.",
     tags: [
       "GRPO",
       "RFT",
