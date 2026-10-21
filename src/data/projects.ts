@@ -122,17 +122,17 @@ const cards = [
   {
     id: "res-colm",
     kind: "research",
-    title: "Don't Make the LLM Read the Graph — Make the Graph Think",
-    summary: "Investigating whether belief graphs improve LLM cooperation in Hanabi across 3,000+ trials and four model families. Identified \"Planner Defiance\" — a novel failure mode where LLMs override correct graph recommendations. Under review at COLM 2026.",
+    title: "Don't Make the LLM Read the Graph: Make the Graph Think",
+    summary: "Investigating whether belief graphs improve LLM cooperation in Hanabi across 3,000+ trials and four model families. Identified \"Planner Defiance\", a novel failure mode where LLMs override correct graph recommendations.",
     tags: [
       "Multi-Agent",
       "Hanabi",
       "Belief Graphs",
       "LLM Reasoning",
     ],
-    status: { kind: 'under-review', venue: 'COLM 2026' },
+    status: { kind: 'preprint' },
     publishedOn: on('2025-11-01'),
-    paper: "https://openreview.net/forum?id=y3TtQFiodt",
+    paper: "https://arxiv.org/abs/2604.23057",
   },
   {
     id: "proj-distill",
