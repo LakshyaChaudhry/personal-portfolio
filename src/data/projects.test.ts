@@ -22,12 +22,21 @@ it('exposes the catalog faces in research-then-date order', () => {
 
   expect(experienceRows.map((row) => row.id)).toEqual([
     'exp-mars',
+    'exp-purdue',
     'exp-0',
     'exp-1',
     'exp-2',
     'exp-3',
     'exp-4',
   ])
+
+  expect(experienceRows.find((row) => row.id === 'exp-purdue')).toEqual({
+    id: 'exp-purdue',
+    title: 'Purdue University',
+    role: 'Undergraduate Researcher',
+    period: '',
+    tags: ['Advised by Dr. Ruqi Zhang'],
+  })
 
   const grpo = face('res-rl-or-data')
   expect(grpo.activation).toEqual({
@@ -74,5 +83,6 @@ it('exposes the catalog faces in research-then-date order', () => {
   expect(signal.links).toHaveLength(0)
 
   expect(cardFaces.map((item) => item.tags.length)).toEqual([4, 4, 4, 4, 4, 4, 4, 4, 4])
-  expect(JSON.stringify({ experienceRows, cardFaces })).not.toMatch(/student|Purdue/i)
+  expect(JSON.stringify(cardFaces)).not.toMatch(/student|Purdue/i)
+  expect(JSON.stringify(experienceRows)).not.toMatch(/\bstudent\b/i)
 })

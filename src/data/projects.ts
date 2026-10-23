@@ -15,6 +15,15 @@ const experience = [
     ],
   },
   {
+    id: "exp-purdue",
+    title: "Purdue University",
+    role: "Undergraduate Researcher",
+    period: "",
+    tags: [
+      "Advised by Dr. Ruqi Zhang",
+    ],
+  },
+  {
     id: "exp-0",
     title: "Cisco",
     role: "AI/ML Engineering Intern",
